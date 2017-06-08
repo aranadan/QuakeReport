@@ -36,7 +36,7 @@ public class EarthquakeActivity extends AppCompatActivity {
     //URL to get JSON Array
     private static final String URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2016-01-01&endtime=2016-01-31&minmag=6&limit=10";
 
-    ArrayList<Earthquake> earthquakeArrayList = new ArrayList<>();
+    private ArrayList<Earthquake> earthquakeArrayList = new ArrayList<>();
 
 
 
@@ -48,16 +48,14 @@ public class EarthquakeActivity extends AppCompatActivity {
 
         earthquakeArrayList = new ArrayList<>();
         new GetJson().execute();
-
-
-
     }
 
     private class GetJson extends AsyncTask<Void, Void, Void> {
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            Toast.makeText(EarthquakeActivity.this,"Json Data is downloading",Toast.LENGTH_LONG).show();
+            Toast.makeText(EarthquakeActivity.this, "Json Data is downloading", Toast.LENGTH_LONG).show();
         }
 
         @Override
@@ -66,8 +64,7 @@ public class EarthquakeActivity extends AppCompatActivity {
             HttpHandler  sh = new HttpHandler();
 
             // Making a request to URL and getting response
-            String url = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2016-01-01&endtime=2016-01-31&minmag=6&limit=10";
-            String jsonStr = sh.makeServiceCall(url);
+            String jsonStr = sh.makeServiceCall(URL);
 
             Log.e(TAG, "Response from URL: " + jsonStr);
             if (jsonStr != null){
@@ -81,7 +78,7 @@ public class EarthquakeActivity extends AppCompatActivity {
                         JSONObject  object = featuresArray.getJSONObject(i);
                         JSONObject objectProperties = object.getJSONObject("properties");
 
-                        String mag = objectProperties.getString("mag");
+                        Double mag = objectProperties.getDouble("mag");
                         String place = objectProperties.getString("place");
                         long time = objectProperties.getLong("time");
 
@@ -104,9 +101,6 @@ public class EarthquakeActivity extends AppCompatActivity {
                     }
                 });
             }
-
-
-
 
             return null;
         }
