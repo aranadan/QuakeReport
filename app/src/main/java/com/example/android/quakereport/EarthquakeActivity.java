@@ -21,6 +21,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -59,6 +60,20 @@ public class EarthquakeActivity extends AppCompatActivity {
                 intentCallWeb.setData(Uri.parse( earthquakeArrayList.get(i).getUrlDetail()));
                 //call activity
                 startActivity(intentCallWeb);
+            }
+        });
+        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView absListView, int i) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView absListView, int firstVisible, int visibleCount, int totalItem) {
+                if(firstVisible + visibleCount == totalItem){
+
+                }
+
             }
         });
         earthquakeArrayList = new ArrayList<>();
@@ -128,7 +143,6 @@ public class EarthquakeActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-           // Toast.makeText(EarthquakeActivity.this,"Json Data is downloaded!!!",Toast.LENGTH_LONG).show();
 
            EarthquakeAdapter adapter = new EarthquakeAdapter(EarthquakeActivity.this, earthquakeArrayList);
 
