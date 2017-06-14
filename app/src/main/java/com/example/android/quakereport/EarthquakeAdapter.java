@@ -2,6 +2,7 @@ package com.example.android.quakereport;
 
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -76,11 +77,44 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
         return listItemView;
     }
 
-    private int getMagnitudeColor(Double magnitude) {
-        switch (magnitude){
-            int output;
-            case 0;
+    private int getMagnitudeColor(double magnitude) {
+        int output;
+        //Возвращает наибольшее целое, меньшее или равное аргументу
+        int magnitudeFloor = (int) Math.floor(magnitude);
+        switch (magnitudeFloor){
+            case 0:
+            case 1:
+                output = ContextCompat.getColor(getContext(),R.color.magnitude1);
+                break;
+            case 2:
+                output = ContextCompat.getColor(getContext(),R.color.magnitude2);
+                break;
+            case 3:
+                output = ContextCompat.getColor(getContext(),R.color.magnitude3);
+                break;
+            case 4:
+                output = ContextCompat.getColor(getContext(),R.color.magnitude4);
+                break;
+            case 5:
+                output = ContextCompat.getColor(getContext(),R.color.magnitude5);
+                break;
+            case 6:
+                output = ContextCompat.getColor(getContext(),R.color.magnitude6);
+                break;
+            case 7:
+                output = ContextCompat.getColor(getContext(),R.color.magnitude7);
+                break;
+            case 8:
+                output = ContextCompat.getColor(getContext(),R.color.magnitude8);
+                break;
+            case 9:
+                output = ContextCompat.getColor(getContext(),R.color.magnitude9);
+                break;
+            default:
+                output = ContextCompat.getColor(getContext(),R.color.magnitude10plus);
+                break;
         }
+        return output;
     }
 
     /**

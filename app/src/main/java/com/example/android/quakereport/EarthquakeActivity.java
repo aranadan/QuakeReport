@@ -15,10 +15,14 @@
  */
 package com.example.android.quakereport;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -35,7 +39,7 @@ public class EarthquakeActivity extends AppCompatActivity {
 
     //URL to get JSON Array
     private static final String URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2016-01-01&endtime=2016-01-31&minmag=6&limit=10";
-
+    ListView listView;
     private ArrayList<Earthquake> earthquakeArrayList = new ArrayList<>();
 
 
@@ -46,8 +50,24 @@ public class EarthquakeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.earthquake_activity);
 
+        listView = (ListView) findViewById(R.id.list);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                //create intent to call the browser
+                Intent intentCallWeb = new Intent(Intent.ACTION_VIEW);
+                //put data to intent
+                intentCallWeb.setData(Uri.parse( earthquakeArrayList.get(i).getUrlDetail()));
+                //call activity
+                startActivity(intentCallWeb);
+            }
+        });
         earthquakeArrayList = new ArrayList<>();
         new GetJson().execute();
+
+
+
+
     }
 
     private class GetJson extends AsyncTask<Void, Void, Void> {
@@ -66,7 +86,7 @@ public class EarthquakeActivity extends AppCompatActivity {
             // Making a request to URL and getting response
             String jsonStr = sh.makeServiceCall(URL);
 
-            Log.e(TAG, "Response from URL: " + jsonStr);
+            //Log.e(TAG, "Response from URL: " + jsonStr);
             if (jsonStr != null){
                 try{
                     JSONObject jsonObject = new JSONObject(jsonStr);
@@ -81,9 +101,10 @@ public class EarthquakeActivity extends AppCompatActivity {
                         Double mag = objectProperties.getDouble("mag");
                         String place = objectProperties.getString("place");
                         long time = objectProperties.getLong("time");
+                        String urlDetail = objectProperties.getString("url");
 
                         //add data to arrayList
-                        earthquakeArrayList.add(new Earthquake(mag,place,time));
+                        earthquakeArrayList.add(new Earthquake(mag,place,time,urlDetail));
 
                     }
 
@@ -91,7 +112,7 @@ public class EarthquakeActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }else {
-                Log.e(TAG, "Couldn't get json from server.");
+                //Log.e(TAG, "Couldn't get json from server.");
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
