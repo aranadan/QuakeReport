@@ -20,7 +20,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -38,7 +37,7 @@ public class EarthquakeActivity extends AppCompatActivity {
     public static final String TAG = EarthquakeActivity.class.getName();
 
     //URL to get JSON Array
-    private static final String URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2016-01-01&endtime=2016-01-31&minmag=6&limit=10";
+    private static final String URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&limit=10";
     ListView listView;
     private ArrayList<Earthquake> earthquakeArrayList = new ArrayList<>();
 
