@@ -21,9 +21,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -35,11 +36,15 @@ import java.util.ArrayList;
 
 public class EarthquakeActivity extends AppCompatActivity {
 
-    public static final String TAG = EarthquakeActivity.class.getName();
-
+    int countToDownload = 10;
+    String selectedSpinnerItem = "1";
+    String minMagnitude = "&minmagnitude=";
+    private String baseUrl = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&limit=";
     //URL to get JSON Array
-    private static final String URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&limit=10";
+    private String URL = baseUrl + countToDownload + minMagnitude + selectedSpinnerItem ;
     ListView listView;
+    Spinner scaleSpinner;
+
     private ArrayList<Earthquake> earthquakeArrayList = new ArrayList<>();
 
 
@@ -49,6 +54,33 @@ public class EarthquakeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.earthquake_activity);
+        scaleSpinner = (Spinner) findViewById(R.id.spinner);
+        earthquakeArrayList = new ArrayList<>();
+        new GetJson().execute();
+
+        //config adapter
+        final ArrayAdapter<CharSequence> scaleAdapter = ArrayAdapter.createFromResource(this,R.array.scalelist,android.R.layout.simple_spinner_item);
+        scaleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        //call adapter
+        scaleSpinner.setAdapter(scaleAdapter);
+
+        scaleSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (Integer.valueOf(selectedSpinnerItem) != Integer.valueOf(String.valueOf(scaleAdapter.getItem(position)))) {
+                    selectedSpinnerItem = (String) scaleAdapter.getItem(position);
+                    //Toast.makeText(getApplicationContext(), selectedSpinnerItem, Toast.LENGTH_LONG).show();
+                    URL = baseUrl + countToDownload + minMagnitude + selectedSpinnerItem;
+                    new GetJson().execute();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         listView = (ListView) findViewById(R.id.list);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -62,29 +94,11 @@ public class EarthquakeActivity extends AppCompatActivity {
                 startActivity(intentCallWeb);
             }
         });
-        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(AbsListView absListView, int i) {
-
-            }
-
-            @Override
-            public void onScroll(AbsListView absListView, int firstVisible, int visibleCount, int totalItem) {
-                if(firstVisible + visibleCount == totalItem){
-
-                }
-
-            }
-        });
-        earthquakeArrayList = new ArrayList<>();
-        new GetJson().execute();
-
-
-
+        //listView.setOnScrollListener(this);
 
     }
 
-    private class GetJson extends AsyncTask<Void, Void, Void> {
+     private class GetJson extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected void onPreExecute() {
@@ -107,6 +121,12 @@ public class EarthquakeActivity extends AppCompatActivity {
 
                     // Getting JSON Array node
                     JSONArray featuresArray = jsonObject.getJSONArray("features");
+
+                    //clear array if not null
+                   if (earthquakeArrayList != null){
+                        earthquakeArrayList.clear();
+                    }
+
                     //looping through All features
                     for (int i = 0; i < featuresArray.length(); i++) {
                         JSONObject  object = featuresArray.getJSONObject(i);
