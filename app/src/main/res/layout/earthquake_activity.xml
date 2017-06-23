@@ -20,16 +20,29 @@
 
         <TextView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Set the scale"
+            android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
-            android:textSize="20dp"/>
+            android:gravity="center"
+            android:text="Set the scale"
+            android:textSize="22sp" />
         <Spinner
             android:id="@+id/spinner"
             android:layout_width="wrap_content"
-            android:layout_height="30sp"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
             />
+
+        <TextView
+            android:id="@+id/setDate"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:onClick="onClickChooseDate"
+            android:hint="Choose date"
+            android:inputType="date"
+            android:textSize="22sp"
+            android:gravity="center"/>
+
 
     </LinearLayout>
 
@@ -38,14 +51,13 @@
         android:layout_height="wrap_content"
         android:layout_weight="1">
 
-    <ListView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/list"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:divider="@null"
-        android:dividerHeight="0dp">
-    </ListView>
+        <ListView
+            android:id="@+id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@null"
+            android:dividerHeight="0dp"
+            android:orientation="vertical"></ListView>
 
     </LinearLayout>
 </LinearLayout>

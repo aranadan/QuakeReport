@@ -15,16 +15,22 @@
  */
 package com.example.android.quakereport;
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -32,16 +38,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 
 public class EarthquakeActivity extends AppCompatActivity {
 
-    int countToDownload = 10;
-    String selectedSpinnerItem = "1";
-    String minMagnitude = "&minmagnitude=";
-    private String baseUrl = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&limit=";
+    static TextView tvDate;
+    static int selectedSpinnerItem = 1;
     //URL to get JSON Array
-    private String URL = baseUrl + countToDownload + minMagnitude + selectedSpinnerItem ;
+    private String URL;
     ListView listView;
     Spinner scaleSpinner;
 
@@ -56,7 +61,16 @@ public class EarthquakeActivity extends AppCompatActivity {
         setContentView(R.layout.earthquake_activity);
         scaleSpinner = (Spinner) findViewById(R.id.spinner);
         earthquakeArrayList = new ArrayList<>();
-        new GetJson().execute();
+        tvDate = (TextView) findViewById(R.id.setDate);
+
+        final Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH)+1;
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        final String date = year + "-" + month + "-" + day;
+        tvDate.setText(date);
+        setURLQuery(1, tvDate.getText().toString());
+
 
         //config adapter
         final ArrayAdapter<CharSequence> scaleAdapter = ArrayAdapter.createFromResource(this,R.array.scalelist,android.R.layout.simple_spinner_item);
@@ -69,10 +83,9 @@ public class EarthquakeActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (Integer.valueOf(selectedSpinnerItem) != Integer.valueOf(String.valueOf(scaleAdapter.getItem(position)))) {
-                    selectedSpinnerItem = (String) scaleAdapter.getItem(position);
+                    selectedSpinnerItem = Integer.parseInt(scaleAdapter.getItem(position).toString());
                     //Toast.makeText(getApplicationContext(), selectedSpinnerItem, Toast.LENGTH_LONG).show();
-                    URL = baseUrl + countToDownload + minMagnitude + selectedSpinnerItem;
-                    new GetJson().execute();
+                    setURLQuery(selectedSpinnerItem, tvDate.getText().toString());
                 }
             }
 
@@ -152,7 +165,7 @@ public class EarthquakeActivity extends AppCompatActivity {
                     public void run() {
                         Toast.makeText(getApplicationContext(),
                                 "Couldn't get json from server. Check LogCat for possible errors!",
-                                Toast.LENGTH_LONG).show();
+                                Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -171,7 +184,64 @@ public class EarthquakeActivity extends AppCompatActivity {
             // Find a reference to the {@link ListView} in the layout
             ListView earthquakeListView = (ListView) findViewById(R.id.list);
             earthquakeListView.setAdapter(adapter);
+            //setURLQuery(selectedSpinnerItem,tvDate.getText().toString());
+        }
+    }
 
+    public void onClickChooseDate(View v){
+        DatePickerFragment dialogFragment = new DatePickerFragment();
+        dialogFragment.show(getFragmentManager(),"dialogFragment");
+    }
+
+    public void setURLQuery(int magnitude,String date){
+        URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minmagnitude=" +magnitude+ "&starttime=" +date;//+ "&endtime=" + date;
+        Log.e(HttpHandler.TAG,URL);
+        new GetJson().execute();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Toast.makeText(getApplicationContext(),"on pause",Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Toast.makeText(getApplicationContext(),"on resume",Toast.LENGTH_SHORT).show();
+    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Toast.makeText(getApplicationContext(),"on start",Toast.LENGTH_SHORT).show();
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Toast.makeText(getApplicationContext(),"on stop",Toast.LENGTH_SHORT).show();
+    }
+
+    private class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
+
+
+        @Override
+        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+            int month = monthOfYear+1;
+            String dateInString = year + "-" + month + "-" + dayOfMonth;
+            tvDate.setText(dateInString);
+            setURLQuery(selectedSpinnerItem,dateInString);
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the current date as the default date in the picker
+            final Calendar c = Calendar.getInstance();
+            int year = c.get(Calendar.YEAR);
+            int month = c.get(Calendar.MONTH);
+            int day = c.get(Calendar.DAY_OF_MONTH);
+
+            // Create a new instance of DatePickerDialog and return it
+            return new DatePickerDialog(getActivity(),this,year,month,day);
         }
     }
 
