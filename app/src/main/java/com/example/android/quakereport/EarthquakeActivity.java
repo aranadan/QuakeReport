@@ -43,7 +43,7 @@ import java.util.Calendar;
 
 public class EarthquakeActivity extends AppCompatActivity {
 
-    static TextView tvDate;
+    TextView tvDate;
     static int selectedSpinnerItem = 1;
     //URL to get JSON Array
     private String URL;
