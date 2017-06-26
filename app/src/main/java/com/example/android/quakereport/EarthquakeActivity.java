@@ -194,7 +194,9 @@ public class EarthquakeActivity extends AppCompatActivity {
     }
 
     public void setURLQuery(int magnitude,String date){
-        URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minmagnitude=" +magnitude+ "&starttime=" +date;//+ "&endtime=" + date;
+        earthquakeArrayList.clear();
+        URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minmagnitude="
+                +magnitude+ "&starttime=" +date+"T00:00:00"+"%2b03" + "&endtime=" + date + "T23:59:59%2b03"; //%2b вместо +
         Log.e(HttpHandler.TAG,URL);
         new GetJson().execute();
     }
@@ -227,7 +229,7 @@ public class EarthquakeActivity extends AppCompatActivity {
         @Override
         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
             int month = monthOfYear+1;
-            String dateInString = year + "-" + month + "-" + dayOfMonth;
+            String dateInString = year +"-" + month +"-"+ dayOfMonth;
             tvDate.setText(dateInString);
             setURLQuery(selectedSpinnerItem,dateInString);
         }
