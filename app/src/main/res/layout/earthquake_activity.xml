@@ -18,31 +18,24 @@
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_vertical"
-            android:gravity="center"
-            android:text="Set the scale"
-            android:textSize="22sp" />
         <Spinner
             android:id="@+id/spinner"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_gravity="center"
-
+            android:background="@drawable/magnitude_circle"
             />
 
         <TextView
             android:id="@+id/setDate"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:onClick="onClickChooseDate"
             android:hint="Choose date"
             android:inputType="date"
-            android:textSize="22sp"
-            android:gravity="center"/>
+            android:textSize="18sp"
+            android:textColor="@color/colorPrimary"
+            android:gravity="end"/>
 
 
     </LinearLayout>

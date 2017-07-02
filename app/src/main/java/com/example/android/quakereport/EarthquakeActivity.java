@@ -19,6 +19,7 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -37,6 +38,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -49,7 +51,7 @@ public class EarthquakeActivity extends AppCompatActivity {
     private String URL;
     ListView listView;
     Spinner scaleSpinner;
-
+    String jsonStr=null;
     private ArrayList<Earthquake> earthquakeArrayList = new ArrayList<>();
 
 
@@ -125,10 +127,14 @@ public class EarthquakeActivity extends AppCompatActivity {
             HttpHandler  sh = new HttpHandler();
 
             // Making a request to URL and getting response
-            String jsonStr = sh.makeServiceCall(URL);
+            jsonStr = sh.makeServiceCall(URL);
+
+            if (jsonStr==null)
+                loadText();
 
             //Log.e(TAG, "Response from URL: " + jsonStr);
-            if (jsonStr != null){
+            if (jsonStr != null ){
+
                 try{
                     JSONObject jsonObject = new JSONObject(jsonStr);
 
@@ -168,6 +174,7 @@ public class EarthquakeActivity extends AppCompatActivity {
                                 Toast.LENGTH_SHORT).show();
                     }
                 });
+
             }
 
             return null;
@@ -204,27 +211,35 @@ public class EarthquakeActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        Toast.makeText(getApplicationContext(),"on pause",Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getApplicationContext(),"on pause",Toast.LENGTH_SHORT).show();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Toast.makeText(getApplicationContext(),"on resume",Toast.LENGTH_SHORT).show();
     }
     @Override
     protected void onStart() {
         super.onStart();
-        Toast.makeText(getApplicationContext(),"on start",Toast.LENGTH_SHORT).show();
     }
     @Override
     protected void onStop() {
         super.onStop();
-        Toast.makeText(getApplicationContext(),"on stop",Toast.LENGTH_SHORT).show();
     }
 
-    private class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //save data from server to phone
+        SharedPreferences sPref = getSharedPreferences("MyPref", MODE_PRIVATE);
+        SharedPreferences.Editor ed = sPref.edit();
+        ed.putString("data", jsonStr);
+        ed.apply();
+        Toast.makeText(this, "Text saved", Toast.LENGTH_SHORT).show();
 
+    }
+
+    public  class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 
         @Override
         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
@@ -247,7 +262,24 @@ public class EarthquakeActivity extends AppCompatActivity {
         }
     }
 
+    private void loadText() {
+       SharedPreferences sPref = getSharedPreferences("MyPref", MODE_PRIVATE);
+       jsonStr = sPref.getString("data", "");
+        Log.e(HttpHandler.TAG,jsonStr);
+    }
 
+    public boolean isInternetAvailable() {
+        try {
+            InetAddress ipAddr = InetAddress.getByName("google.com"); //You can replace it with your name
+            Log.e(HttpHandler.TAG,ipAddr.toString());
+            return !ipAddr.equals("");
+
+
+        } catch (Exception e) {
+            return false;
+        }
+
+    }
 }
 
 
