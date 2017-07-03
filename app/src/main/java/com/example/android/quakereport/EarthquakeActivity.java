@@ -23,6 +23,8 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -38,21 +40,21 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Calendar;
 
 
-public class EarthquakeActivity extends AppCompatActivity {
+public class EarthquakeActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
-    TextView tvDate;
-    static int selectedSpinnerItem = 1;
+    private TextView tvDate;
+    private int selectedSpinnerItem = 1;
     //URL to get JSON Array
     private String URL;
-    ListView listView;
-    Spinner scaleSpinner;
-    String jsonStr=null;
+    private ListView listView;
+    private Spinner scaleSpinner;
+    private String jsonStr = null;
     private ArrayList<Earthquake> earthquakeArrayList = new ArrayList<>();
+    private SwipeRefreshLayout swipeRefreshLayout;
 
 
 
@@ -61,59 +63,24 @@ public class EarthquakeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.earthquake_activity);
-        scaleSpinner = (Spinner) findViewById(R.id.spinner);
-        earthquakeArrayList = new ArrayList<>();
-        tvDate = (TextView) findViewById(R.id.setDate);
+        initialize();
 
-        final Calendar c = Calendar.getInstance();
-        int year = c.get(Calendar.YEAR);
-        int month = c.get(Calendar.MONTH)+1;
-        int day = c.get(Calendar.DAY_OF_MONTH);
-        final String date = year + "-" + month + "-" + day;
-        tvDate.setText(date);
-        setURLQuery(1, tvDate.getText().toString());
-
-
-        //config adapter
-        final ArrayAdapter<CharSequence> scaleAdapter = ArrayAdapter.createFromResource(this,R.array.scalelist,android.R.layout.simple_spinner_item);
-        scaleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        //call adapter
-        scaleSpinner.setAdapter(scaleAdapter);
-
-        scaleSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (Integer.valueOf(selectedSpinnerItem) != Integer.valueOf(String.valueOf(scaleAdapter.getItem(position)))) {
-                    selectedSpinnerItem = Integer.parseInt(scaleAdapter.getItem(position).toString());
-                    //Toast.makeText(getApplicationContext(), selectedSpinnerItem, Toast.LENGTH_LONG).show();
-                    setURLQuery(selectedSpinnerItem, tvDate.getText().toString());
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        listView = (ListView) findViewById(R.id.list);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                //create intent to call the browser
-                Intent intentCallWeb = new Intent(Intent.ACTION_VIEW);
-                //put data to intent
-                intentCallWeb.setData(Uri.parse( earthquakeArrayList.get(i).getUrlDetail()));
-                //call activity
-                startActivity(intentCallWeb);
-            }
-        });
-        //listView.setOnScrollListener(this);
 
     }
 
-     private class GetJson extends AsyncTask<Void, Void, Void> {
+    @Override
+    public void onRefresh() {
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                swipeRefreshLayout.setRefreshing(false);
+                setURLQuery(selectedSpinnerItem, tvDate.getText().toString());
+            }
+        },1000);
+    }
+
+    private class GetJson extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected void onPreExecute() {
@@ -130,7 +97,7 @@ public class EarthquakeActivity extends AppCompatActivity {
             jsonStr = sh.makeServiceCall(URL);
 
             if (jsonStr==null)
-                loadText();
+                loadDataFromSD();
 
             //Log.e(TAG, "Response from URL: " + jsonStr);
             if (jsonStr != null ){
@@ -262,23 +229,78 @@ public class EarthquakeActivity extends AppCompatActivity {
         }
     }
 
-    private void loadText() {
+    private void loadDataFromSD() {
        SharedPreferences sPref = getSharedPreferences("MyPref", MODE_PRIVATE);
        jsonStr = sPref.getString("data", "");
         Log.e(HttpHandler.TAG,jsonStr);
     }
 
-    public boolean isInternetAvailable() {
-        try {
-            InetAddress ipAddr = InetAddress.getByName("google.com"); //You can replace it with your name
-            Log.e(HttpHandler.TAG,ipAddr.toString());
-            return !ipAddr.equals("");
-
-
-        } catch (Exception e) {
-            return false;
+    private void onScaleItemSelected (int minMagnitude){
+        ArrayList<Earthquake> filteredarray = new ArrayList<>();
+        for (Earthquake earthquake : earthquakeArrayList){
+            if (earthquake.getMagnitude()>= (double) minMagnitude){
+                filteredarray.add(earthquake);
+            }
         }
+        EarthquakeAdapter adapter = new EarthquakeAdapter(EarthquakeActivity.this,filteredarray);
+        ListView earthquakeListView = (ListView) findViewById(R.id.list);
+        earthquakeListView.setAdapter(adapter);
+    }
+    private void initialize(){
 
+        scaleSpinner = (Spinner) findViewById(R.id.spinner);
+        earthquakeArrayList = new ArrayList<>();
+        tvDate = (TextView) findViewById(R.id.setDate);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
+        swipeRefreshLayout.setOnRefreshListener(EarthquakeActivity.this);
+        swipeRefreshLayout.setColorSchemeColors(android.R.color.holo_blue_bright,android.R.color.holo_green_light,android.R.color.holo_orange_light);
+
+        final Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH)+1;
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        final String date = year + "-" + month + "-" + day;
+        tvDate.setText(date);
+
+
+
+
+        //config adapter
+        final ArrayAdapter<CharSequence> scaleAdapter = ArrayAdapter.createFromResource(this,R.array.scalelist,android.R.layout.simple_spinner_item);
+        scaleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        //call adapter
+        scaleSpinner.setAdapter(scaleAdapter);
+
+        scaleSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (Integer.valueOf(selectedSpinnerItem) != Integer.valueOf(String.valueOf(scaleAdapter.getItem(position)))) {
+                    selectedSpinnerItem = Integer.parseInt(scaleAdapter.getItem(position).toString());
+                    onScaleItemSelected(selectedSpinnerItem);
+                    //Toast.makeText(getApplicationContext(), selectedSpinnerItem, Toast.LENGTH_LONG).show();
+                    //setURLQuery(selectedSpinnerItem, tvDate.getText().toString());
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        listView = (ListView) findViewById(R.id.list);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                //create intent to call the browser
+                Intent intentCallWeb = new Intent(Intent.ACTION_VIEW);
+                //put data to intent
+                intentCallWeb.setData(Uri.parse( earthquakeArrayList.get(i).getUrlDetail()));
+                //call activity
+                startActivity(intentCallWeb);
+            }
+        });
     }
 }
 
