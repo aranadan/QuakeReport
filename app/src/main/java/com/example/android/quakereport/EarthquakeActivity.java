@@ -70,8 +70,10 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
 
     @Override
     public void onRefresh() {
-
-        new Handler().postDelayed(new Runnable() {
+        // начинаем показывать прогресс
+        swipeRefreshLayout.setRefreshing(true);
+        // ждем 1 секунду и прячем прогресс
+        swipeRefreshLayout.postDelayed(new Runnable() {
             @Override
             public void run() {
                 swipeRefreshLayout.setRefreshing(false);
@@ -253,7 +255,6 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         tvDate = (TextView) findViewById(R.id.setDate);
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
         swipeRefreshLayout.setOnRefreshListener(EarthquakeActivity.this);
-        swipeRefreshLayout.setColorSchemeColors(android.R.color.holo_blue_bright,android.R.color.holo_green_light,android.R.color.holo_orange_light);
 
         final Calendar c = Calendar.getInstance();
         int year = c.get(Calendar.YEAR);
