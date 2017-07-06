@@ -2,32 +2,32 @@ package com.example.android.quakereport;
 
 
 public class Earthquake  {
-    private String mLocation;
-    private Double mMagnitude;
-    private long mTime;
-    private String urlDetail;
+    private final String mLocation;
+    private final Double mMagnitude;
+    private final long mTime;
+    private final String urlDetail;
 
     public String getLocation() {
-        return this.mLocation;
+        return mLocation;
     }
 
     public Double getMagnitude() {
-        return this.mMagnitude;
+        return mMagnitude;
     }
 
     public long getTimeInMilliseconds() {
 
-        return mTime;
+        return this.mTime;
     }
 
     public String getUrlDetail() {
-        return this.urlDetail;
+        return urlDetail;
     }
 
     public Earthquake(Double magnitude, String location, long date, String url){
-        mLocation = location;
-        mMagnitude = magnitude;
-        mTime = date;
-        urlDetail = url;
+        this.mLocation = location;
+        this.mMagnitude = magnitude;
+        this.mTime = date;
+        this.urlDetail = url;
     }
 }

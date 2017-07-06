@@ -23,7 +23,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -52,8 +51,8 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
     private String URL;
     private ListView listView;
     private Spinner scaleSpinner;
-    private String jsonStr = null;
-    private ArrayList<Earthquake> earthquakeArrayList = new ArrayList<>();
+    private String jsonStr;
+    private ArrayList<Earthquake> earthquakeArrayList;
     private SwipeRefreshLayout swipeRefreshLayout;
 
 
@@ -64,8 +63,6 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         super.onCreate(savedInstanceState);
         setContentView(R.layout.earthquake_activity);
         initialize();
-
-
     }
 
     @Override
@@ -101,7 +98,6 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
             if (jsonStr==null)
                 loadDataFromSD();
 
-            //Log.e(TAG, "Response from URL: " + jsonStr);
             if (jsonStr != null ){
 
                 try{
@@ -151,8 +147,7 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
 
         @Override
         protected void onPostExecute(Void result) {
-            super.onPostExecute(result);
-
+           super.onPostExecute(result);
            EarthquakeAdapter adapter = new EarthquakeAdapter(EarthquakeActivity.this, earthquakeArrayList);
 
             // Set the adapter on the {@link ListView}
@@ -263,24 +258,18 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         final String date = year + "-" + month + "-" + day;
         tvDate.setText(date);
 
-
-
-
         //config adapter
         final ArrayAdapter<CharSequence> scaleAdapter = ArrayAdapter.createFromResource(this,R.array.scalelist,android.R.layout.simple_spinner_item);
         scaleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         //call adapter
         scaleSpinner.setAdapter(scaleAdapter);
-
         scaleSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (Integer.valueOf(selectedSpinnerItem) != Integer.valueOf(String.valueOf(scaleAdapter.getItem(position)))) {
                     selectedSpinnerItem = Integer.parseInt(scaleAdapter.getItem(position).toString());
                     onScaleItemSelected(selectedSpinnerItem);
-                    //Toast.makeText(getApplicationContext(), selectedSpinnerItem, Toast.LENGTH_LONG).show();
-                    //setURLQuery(selectedSpinnerItem, tvDate.getText().toString());
                 }
             }
 

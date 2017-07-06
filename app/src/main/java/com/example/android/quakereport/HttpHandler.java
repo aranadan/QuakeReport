@@ -20,33 +20,37 @@ public class HttpHandler {
     public HttpHandler() {
     }
 
-    public String makeServiceCall(String reqUrl) {
+    public static String makeServiceCall(final String reqUrl) {
         String response = null;
         try {
-            URL url = new URL(reqUrl);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            final URL url = new URL(reqUrl);
+            final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             // read the response
-            InputStream in = new BufferedInputStream(conn.getInputStream());
-            response = convertStreamToString(in);
-        } catch (MalformedURLException e) {
-            Log.e(TAG, "MalformedURLException: " + e.getMessage());
+
+            final InputStream in = new BufferedInputStream(conn.getInputStream());
+            response = HttpHandler.convertStreamToString(in);
+
+        } catch (final MalformedURLException e) {
+            Log.e(HttpHandler.TAG, "MalformedURLException: " + e.getMessage());
         } catch (ProtocolException e) {
-            Log.e(TAG, "ProtocolException: " + e.getMessage());
+            Log.e(HttpHandler.TAG, "ProtocolException: " + e.getMessage());
         } catch (IOException e) {
-            Log.e(TAG, "IOException: " + e.getMessage());
-        } catch (Exception e) {
-            Log.e(TAG, "Exception: " + e.getMessage());
+            Log.e(HttpHandler.TAG, "IOException: " + e.getMessage());
+        } catch (RuntimeException e) {
+            Log.e(HttpHandler.TAG, "Exception: " + e.getMessage());
         }
+
         return response;
     }
 
-    private String convertStreamToString(InputStream is) {
+
+    private static String convertStreamToString(final InputStream is){
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
+        @SuppressWarnings("StringBufferWithoutInitialCapacity") StringBuilder sb = new StringBuilder();
 
         String line;
-        try {
+        try{
             while ((line = reader.readLine()) != null) {
                 sb.append(line).append('\n');
             }
