@@ -98,7 +98,7 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
             // Making a request to URL and getting response
             jsonStr = sh.makeServiceCall(URL);
 
-            if (jsonStr==null)
+            if (jsonStr == null)
                 loadDataFromSD();
 
             if (jsonStr != null ){
@@ -223,8 +223,9 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
     }
 
     private void loadDataFromSD() {
-       SharedPreferences sPref = getSharedPreferences("MyPref", MODE_PRIVATE);
-       jsonStr = sPref.getString("data", "");
+
+        SharedPreferences sPref = getSharedPreferences("MyPref", MODE_PRIVATE);
+        jsonStr = sPref.getString("data", "");
         Log.e(HttpHandler.TAG,jsonStr);
     }
 
