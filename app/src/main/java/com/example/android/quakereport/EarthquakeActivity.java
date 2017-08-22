@@ -23,6 +23,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -41,6 +42,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.zip.Inflater;
 
 
 public class EarthquakeActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
@@ -54,6 +56,7 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
     private String jsonStr;
     private ArrayList<Earthquake> earthquakeArrayList;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private FloatingActionButton fabCallMaps;
 
 
 
@@ -241,7 +244,7 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         EarthquakeAdapter adapter = new EarthquakeAdapter(EarthquakeActivity.this,earthquakeArrayList);
         //create listView
         ListView earthquakeListView = (ListView) findViewById(R.id.list);
-        //set adpater to list
+        //set adapater to list
         earthquakeListView.setAdapter(adapter);
         Toast.makeText(this, "Magnitude is " + minMagnitude, Toast.LENGTH_SHORT).show();
 
@@ -251,8 +254,19 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         scaleSpinner = (Spinner) findViewById(R.id.spinner);
         earthquakeArrayList = new ArrayList<>();
         tvDate = (TextView) findViewById(R.id.setDate);
+
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
         swipeRefreshLayout.setOnRefreshListener(EarthquakeActivity.this);
+
+        //floatingaction button to start map activity
+        fabCallMaps = (FloatingActionButton) findViewById(R.id.fab);
+        fabCallMaps.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+            Intent intentMaps = new Intent(EarthquakeActivity.this,MapsActivity.class);
+                startActivity(intentMaps);
+            }
+        });
 
         final Calendar c = Calendar.getInstance();
         int year = c.get(Calendar.YEAR);

@@ -71,7 +71,8 @@
         android:layout_margin="16dp"
         android:src="@drawable/common_full_open_on_phone"
         app:layout_anchor="@id/list"
-        app:layout_anchorGravity="bottom|end" />
+        app:layout_anchorGravity="bottom|end"
+        android:id="@+id/fab"/>
 
 </android.support.design.widget.CoordinatorLayout>
 
