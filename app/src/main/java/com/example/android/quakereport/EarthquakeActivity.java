@@ -42,11 +42,11 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.zip.Inflater;
 
 
 public class EarthquakeActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
+    private static final String TAG = "myLogs" ;
     private TextView tvDate;
     private int magnitude = 1;
     //URL to get JSON Array
@@ -54,7 +54,7 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
     private ListView listView;
     private Spinner scaleSpinner;
     private String jsonStr;
-    private ArrayList<Earthquake> earthquakeArrayList;
+    public static ArrayList<Earthquake> earthquakeList;
     private SwipeRefreshLayout swipeRefreshLayout;
     private FloatingActionButton fabCallMaps;
 
@@ -72,9 +72,9 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
 
     @Override
     public void onRefresh() {
-        // начинаем показывать прогресс
+        // start show progress
         swipeRefreshLayout.setRefreshing(true);
-        // ждем 1 секунду и прячем прогресс
+        // wait 1 second and hide progress
         swipeRefreshLayout.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -90,7 +90,7 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            Toast.makeText(EarthquakeActivity.this, "Json Data is downloading", Toast.LENGTH_LONG).show();
+            Toast.makeText(EarthquakeActivity.this, "Json Data is downloading", Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -112,23 +112,33 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
                     // Getting JSON Array node
                     JSONArray featuresArray = jsonObject.getJSONArray("features");
 
+
                     //clear array if not null
-                   if (earthquakeArrayList != null){
-                        earthquakeArrayList.clear();
+                   if (earthquakeList != null){
+                        earthquakeList.clear();
                     }
 
                     //looping through All features
                     for (int i = 0; i < featuresArray.length(); i++) {
                         JSONObject  object = featuresArray.getJSONObject(i);
+                        //get object for properties
                         JSONObject objectProperties = object.getJSONObject("properties");
+                        //get object for coordinates
+                        JSONObject objectGeometry = object.getJSONObject("geometry");
+
 
                         Double mag = objectProperties.getDouble("mag");
                         String place = objectProperties.getString("place");
                         long time = objectProperties.getLong("time");
                         String urlDetail = objectProperties.getString("url");
+                        //get json array
+                        JSONArray objectGeometryJSONArray = objectGeometry.getJSONArray("coordinates");
+                        //convert json array to double array
+                        String[] arrayCoordinates =  objectGeometryJSONArray.join(",").split(",");
 
+                        //Log.e(TAG, objectGeometryJSONArray.toString());
                         //add data to arrayList
-                        earthquakeArrayList.add(new Earthquake(mag,place,time,urlDetail));
+                        earthquakeList.add(new Earthquake(mag,place,time,urlDetail,arrayCoordinates));
 
                     }
 
@@ -164,7 +174,7 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
     }
 
     public void setURLQuery(String date){
-        earthquakeArrayList.clear();
+        earthquakeList.clear();
         URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minmagnitude="
                 + 1 + "&starttime=" + date + "T00:00:00"+"%2b03" + "&endtime=" + date + "T23:59:59%2b03"; //%2b вместо +
         Log.e(HttpHandler.TAG,URL);
@@ -235,7 +245,7 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
     //filter list by setting min magnitude
     private void filterListByMagnitude(int minMagnitude){
         ArrayList<Earthquake> earthquakeArrayList = new ArrayList<>();
-        for (Earthquake earthquake : this.earthquakeArrayList){
+        for (Earthquake earthquake : this.earthquakeList){
             if (earthquake.getMagnitude()>= (double) minMagnitude){
                 earthquakeArrayList.add(earthquake);
             }
@@ -244,7 +254,7 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         EarthquakeAdapter adapter = new EarthquakeAdapter(EarthquakeActivity.this,earthquakeArrayList);
         //create listView
         ListView earthquakeListView = (ListView) findViewById(R.id.list);
-        //set adapater to list
+        //set adapter to list
         earthquakeListView.setAdapter(adapter);
         Toast.makeText(this, "Magnitude is " + minMagnitude, Toast.LENGTH_SHORT).show();
 
@@ -252,13 +262,13 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
     private void initialize(){
 
         scaleSpinner = (Spinner) findViewById(R.id.spinner);
-        earthquakeArrayList = new ArrayList<>();
+        earthquakeList = new ArrayList<>();
         tvDate = (TextView) findViewById(R.id.setDate);
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
         swipeRefreshLayout.setOnRefreshListener(EarthquakeActivity.this);
 
-        //floatingaction button to start map activity
+        //floating action button to start map activity
         fabCallMaps = (FloatingActionButton) findViewById(R.id.fab);
         fabCallMaps.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -303,7 +313,7 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
                 //create intent to call the browser
                 Intent intentCallWeb = new Intent(Intent.ACTION_VIEW);
                 //put data to intent
-                intentCallWeb.setData(Uri.parse( earthquakeArrayList.get(i).getUrlDetail()));
+                intentCallWeb.setData(Uri.parse( earthquakeList.get(i).getUrlDetail()));
                 //call activity
                 startActivity(intentCallWeb);
             }
