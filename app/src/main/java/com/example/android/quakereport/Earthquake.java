@@ -54,7 +54,7 @@ public class Earthquake implements ClusterItem {
     @Override
     public String getTitle() {
 
-        return"Magnitude-" + mMagnitude.toString() + ", time-" + new SimpleDateFormat("hh:mm").format(getDate());
+        return"Magnitude-" + mMagnitude.toString() + ", time-" + new SimpleDateFormat("HH:mm").format(getDate());
     }
 
     @Override

@@ -130,10 +130,10 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
     }
 
     /**
-     * Return the formatted date string (i.e. "4:30 PM") from a Date object.
+     * Return the formatted date string (i.e. "14:30") from a Date object.
      */
     private String formatTime(Date dateObject) {
-        SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
         return timeFormat.format(dateObject);
     }
 
