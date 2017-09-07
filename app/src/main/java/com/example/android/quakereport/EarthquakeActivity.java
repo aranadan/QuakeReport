@@ -40,8 +40,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 
 public class EarthquakeActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
@@ -50,13 +52,18 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
     private TextView tvDate;
     private int magnitude = 1;
     //URL to get JSON Array
-    private String URL;
+    public static String URL;
     private ListView listView;
     private Spinner scaleSpinner;
     private String jsonStr;
     public static ArrayList<Earthquake> earthquakeList;
+    public static ArrayList<Earthquake> spinnerArrayList = new ArrayList<>();
     private SwipeRefreshLayout swipeRefreshLayout;
     private FloatingActionButton fabCallMaps;
+    public static SimpleDateFormat dateFormat;
+    private SimpleDateFormat getDateFormatForQuery;
+
+
 
 
 
@@ -67,7 +74,7 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         setContentView(R.layout.earthquake_activity);
         initialize();
         //download data and fill list
-        setURLQuery(tvDate.getText().toString());
+        setURLQuery(getDateFormatForQuery.format(new Date()));
     }
 
     @Override
@@ -80,12 +87,12 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
             public void run() {
                 swipeRefreshLayout.setRefreshing(false);
                 //download data and fill list
-                setURLQuery(tvDate.getText().toString());
+                setURLQuery(getDateFormatForQuery.format(new Date(tvDate.getText().toString())));
             }
         },1000);
     }
 
-    private class GetJson extends AsyncTask<Void, Void, Void> {
+     class GetJson extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected void onPreExecute() {
@@ -173,7 +180,7 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         dialogFragment.show(getFragmentManager(),"dialogFragment");
     }
 
-    public void setURLQuery(String date){
+    public  void setURLQuery(String date){
         earthquakeList.clear();
         URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minmagnitude="
                 + 1 + "&starttime=" + date + "T00:00:00"+"%2b03" + "&endtime=" + date + "T23:59:59%2b03"; //%2b вместо +
@@ -186,7 +193,6 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         super.onPause();
         //Toast.makeText(getApplicationContext(),"on pause",Toast.LENGTH_SHORT).show();
     }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -199,7 +205,6 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
     protected void onStop() {
         super.onStop();
     }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -208,27 +213,29 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         SharedPreferences.Editor ed = sPref.edit();
         ed.putString("data", jsonStr);
         ed.apply();
-        Toast.makeText(this, "Text saved", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Text saved", Toast.LENGTH_SHORT).show();
 
     }
 
-    private class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
+      class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 
-        @Override
+          public DatePickerFragment() {
+          }
+
+          @Override
         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-            int month = monthOfYear+1;
-            String dateInString = year +"-" + month +"-"+ dayOfMonth;
-            tvDate.setText(dateInString);
-            setURLQuery(dateInString);
+              Date date = new Date(year - 1900,monthOfYear,dayOfMonth);
+              tvDate.setText(dateFormat.format(date));
+              setURLQuery(getDateFormatForQuery.format(date));
         }
 
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             // Use the current date as the default date in the picker
-            final Calendar c = Calendar.getInstance();
-            int year = c.get(Calendar.YEAR);
-            int month = c.get(Calendar.MONTH);
-            int day = c.get(Calendar.DAY_OF_MONTH);
+            final Calendar calendar = Calendar.getInstance();
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH);
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
 
             // Create a new instance of DatePickerDialog and return it
             return new DatePickerDialog(getActivity(),this,year,month,day);
@@ -244,19 +251,19 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
 
     //filter list by setting min magnitude
     private void filterListByMagnitude(int minMagnitude){
-        ArrayList<Earthquake> earthquakeArrayList = new ArrayList<>();
-        for (Earthquake earthquake : this.earthquakeList){
+        spinnerArrayList.clear();
+        for (Earthquake earthquake : earthquakeList){
             if (earthquake.getMagnitude()>= (double) minMagnitude){
-                earthquakeArrayList.add(earthquake);
+                spinnerArrayList.add(earthquake);
             }
         }
         //create new adapter
-        EarthquakeAdapter adapter = new EarthquakeAdapter(EarthquakeActivity.this,earthquakeArrayList);
+        EarthquakeAdapter adapter = new EarthquakeAdapter(EarthquakeActivity.this,spinnerArrayList);
         //create listView
         ListView earthquakeListView = (ListView) findViewById(R.id.list);
         //set adapter to list
         earthquakeListView.setAdapter(adapter);
-        Toast.makeText(this, "Magnitude is " + minMagnitude, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Magnitude is " + minMagnitude, Toast.LENGTH_SHORT).show();
 
     }
     private void initialize(){
@@ -278,12 +285,10 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
             }
         });
 
-        final Calendar c = Calendar.getInstance();
-        int year = c.get(Calendar.YEAR);
-        int month = c.get(Calendar.MONTH)+1;
-        int day = c.get(Calendar.DAY_OF_MONTH);
-        final String date = year + "-" + month + "-" + day;
-        tvDate.setText(date);
+        //set date
+        dateFormat = new SimpleDateFormat("LLL dd, yyyy");
+        getDateFormatForQuery = new SimpleDateFormat("yyyy-MM-dd");
+        tvDate.setText(dateFormat.format(new Date()));
 
         //config adapter
         final ArrayAdapter<CharSequence> scaleAdapter = ArrayAdapter.createFromResource(this,R.array.scalelist,android.R.layout.simple_spinner_item);
@@ -311,9 +316,7 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 //create intent to call the browser
-                Intent intentCallWeb = new Intent(Intent.ACTION_VIEW);
-                //put data to intent
-                intentCallWeb.setData(Uri.parse( earthquakeList.get(i).getUrlDetail()));
+                Intent intentCallWeb = new Intent(Intent.ACTION_VIEW, Uri.parse( spinnerArrayList.get(i).getUrlDetail()));
                 //call activity
                 startActivity(intentCallWeb);
             }

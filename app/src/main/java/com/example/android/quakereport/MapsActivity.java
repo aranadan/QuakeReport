@@ -3,6 +3,7 @@ package com.example.android.quakereport;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -54,11 +55,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Add cluster items (markers) to the cluster manager.
         addItems();
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(EarthquakeActivity.spinnerArrayList.get(0).getPosition()));
     }
 
     private void addItems() {
         // Add cluster items in close proximity
-        for (Earthquake item : EarthquakeActivity.earthquakeList) {
+        for (Earthquake item : EarthquakeActivity.spinnerArrayList) {
             mClusterManager.addItem(item);
         }
     }

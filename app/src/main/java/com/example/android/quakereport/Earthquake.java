@@ -4,6 +4,9 @@ package com.example.android.quakereport;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class Earthquake implements ClusterItem {
     private final String mLocation;
     private final Double mMagnitude;
@@ -19,8 +22,8 @@ public class Earthquake implements ClusterItem {
         return mMagnitude;
     }
 
-    public long getTimeInMilliseconds() {
-        return this.mTime;
+    public Date getDate() {
+        return new Date(mTime);
     }
 
     public String getUrlDetail() {
@@ -41,13 +44,21 @@ public class Earthquake implements ClusterItem {
         return new LatLng(Double.parseDouble(coordinates[1]),Double.parseDouble(coordinates[0]));
     }
 
+    public Earthquake() {
+        mLocation = null;
+        urlDetail = null;
+        mMagnitude = null;
+        mTime = 0;
+    }
+
     @Override
     public String getTitle() {
-        return mLocation;
+
+        return"Magnitude-" + mMagnitude.toString() + ", time-" + new SimpleDateFormat("hh:mm").format(getDate());
     }
 
     @Override
     public String getSnippet() {
-        return mMagnitude.toString();
+        return mLocation;
     }
 }
