@@ -3,6 +3,7 @@ package com.example.android.quakereport;
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -48,14 +49,18 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
 
         //Split location on two TextView fields
         String fullLocation = currentEarthquake.getLocation();
-        if (fullLocation.contains("of")){
+
+        if (fullLocation.contains("of")) {
             int indexDivision = fullLocation.indexOf("of") + 3;
-            String region =fullLocation.substring(0,indexDivision);
+            String region = fullLocation.substring(0, indexDivision);
             String offset = fullLocation.substring(indexDivision, fullLocation.length());
 
             //set TextView text
             locationView.setText(region);
             offsetView.setText(offset);
+
+        } else {
+            offsetView.setText(fullLocation);
         }
 
         // Create a new Date object from the time in milliseconds of the earthquake
@@ -74,6 +79,7 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
 
         // Get the appropriate background color based on the current earthquake magnitude
         int magnitudeColor = this.getMagnitudeColor(currentEarthquake.getMagnitude());
+        currentEarthquake.setMagColor(magnitudeColor);
 
         // Set the color on the magnitude circle
         magnitudeCircle.setColor(magnitudeColor);

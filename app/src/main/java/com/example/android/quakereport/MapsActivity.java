@@ -16,10 +16,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private ClusterManager<Earthquake> mClusterManager;
 
-
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +43,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Initialize the manager with the context and the map.
         // (Activity extends context, so we can pass 'this' in the constructor.)
         mClusterManager = new ClusterManager<Earthquake>(this, mMap);
+        mClusterManager.setRenderer(new EarthquakeIconRenderer(this.getApplicationContext(),mMap,mClusterManager));
 
         // Point the map's listeners at the listeners implemented by the cluster
         // manager.
@@ -55,7 +52,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Add cluster items (markers) to the cluster manager.
         addItems();
-
         mMap.moveCamera(CameraUpdateFactory.newLatLng(EarthquakeActivity.spinnerArrayList.get(0).getPosition()));
     }
 

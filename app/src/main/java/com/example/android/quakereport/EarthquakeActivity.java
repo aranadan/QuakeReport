@@ -49,7 +49,7 @@ import java.util.Locale;
 
 public class EarthquakeActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
-    private static final String TAG = "myLogs";
+    public static final String TAG = "myLogs";
     private TextView tvDate;
     private int magnitude = 1;
     //URL to get JSON Array
@@ -101,11 +101,12 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         @Override
         protected Void doInBackground(String... date) {
 
-            HttpHandler sh = new HttpHandler();
+            HttpHandler httpHandler = new HttpHandler();
             URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minmagnitude="
                     + 1 + "&starttime=" + date[0] + "T00:00:00" + "%2b03" + "&endtime=" + date[0] + "T23:59:59%2b03"; //%2b вместо +
             // Making a request to URL and getting response
-            jsonStr = sh.makeServiceCall(URL);
+            //Log.e(TAG,URL.toString());
+            jsonStr = httpHandler.makeServiceCall(URL);
 
             if (jsonStr != null) {
                 getDataFromJson();
@@ -163,6 +164,7 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
                     earthquakeList.add(new Earthquake(mag, place, time, urlDetail, arrayCoordinates));
 
                 }
+
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -247,13 +249,8 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
                 spinnerArrayList.add(earthquake);
             }
         }
-        //create new adapter
-        EarthquakeAdapter adapter = new EarthquakeAdapter(EarthquakeActivity.this, spinnerArrayList);
-        //create listView
-        //ListView earthquakeListView = (ListView) findViewById(R.id.list);
         //set adapter to list
-        listView.setAdapter(adapter);
-
+        listView.setAdapter(new EarthquakeAdapter(EarthquakeActivity.this, spinnerArrayList));
     }
 
     private void initialize() {
@@ -289,7 +286,7 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         scaleSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (Integer.valueOf(magnitude) != Integer.valueOf(String.valueOf(scaleAdapter.getItem(position)))) {
+                if (!Integer.valueOf(magnitude).equals(Integer.valueOf(String.valueOf(scaleAdapter.getItem(position))))) {
                     magnitude = Integer.parseInt(scaleAdapter.getItem(position).toString());
                     filterListByMagnitude(magnitude);
                 }

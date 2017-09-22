@@ -13,6 +13,15 @@ public class Earthquake implements ClusterItem {
     private final long mTime;
     private final String urlDetail;
     private String[] coordinates;
+    private int magColor;
+
+    public int getMagColor() {
+        return magColor;
+    }
+
+    public void setMagColor(int magColor) {
+        this.magColor = magColor;
+    }
 
     public String getLocation() {
         return mLocation;
