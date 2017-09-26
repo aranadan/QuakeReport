@@ -49,7 +49,7 @@ import java.util.Locale;
 public class EarthquakeActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
     public static final String TAG = "myLogs";
-    private int magnitude = 3;
+    public static int magnitude = 1;
     //URL to get JSON Array
     public static String URL;
     private String jsonStr;
@@ -183,7 +183,6 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         SharedPreferences.Editor ed = sPref.edit();
         ed.putString("data", jsonStr);
         ed.apply();
-        Toast.makeText(this, "Text saved", Toast.LENGTH_SHORT).show();
     }
 
     class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
@@ -193,7 +192,6 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         @Override
         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
             date = new Date(year - 1900, monthOfYear, dayOfMonth);
-            Log.e(TAG, date.toString() + " onDateSet");
             new GetJson().execute(getDateFormatForQuery.format(date));
         }
 
@@ -266,9 +264,9 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_set_mag:
+
                 Intent scaleIntent = new Intent(EarthquakeActivity.this, ScaleActivity.class);
                 startActivityForResult(scaleIntent, 1);
-
                 return true;
 
             case R.id.action_set_date:
@@ -281,10 +279,7 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (data == null) return;
-        String scaleResult = data.getStringExtra("scale");
-        magnitude = Integer.parseInt(scaleResult);
-        filterListByMagnitude();
+            filterListByMagnitude();
     }
 
     @Override

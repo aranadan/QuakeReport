@@ -15,10 +15,10 @@
 -->
 <resources>
     <!-- Primary color of the app (shown in the app bar) -->
-    <color name="colorPrimary">#2b3d4d</color>
+    <color name="colorPrimary">#485058</color>
 
     <!-- Primary dark color of the app (shown in the status bar) -->
-    <color name="colorPrimaryDark">#23303D</color>
+    <color name="colorPrimaryDark">#2e3033</color>
 
     <!-- Accent color of the app -->
     <color name="colorAccent">#10CAC9</color>
@@ -58,4 +58,5 @@
 
     <!-- Text color for the primary location of the earthquake in the list item -->
     <color name="textColorEarthquakeLocation">#2B3D4D</color>
+    <color name="gray">#474d53</color>
 </resources>

@@ -69,6 +69,6 @@ public class Earthquake implements ClusterItem {
 
     @Override
     public String getSnippet() {
-        return  "at " + new SimpleDateFormat("HH:mm").format(getDate());
+        return  getLocation() + " at " + new SimpleDateFormat("HH:mm").format(getDate());
     }
 }
