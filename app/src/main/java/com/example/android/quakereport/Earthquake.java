@@ -58,16 +58,17 @@ public class Earthquake implements ClusterItem {
         urlDetail = null;
         mMagnitude = null;
         mTime = 0;
+
     }
 
     @Override
     public String getTitle() {
 
-        return"Magnitude-" + mMagnitude.toString() + ", time-" + new SimpleDateFormat("HH:mm").format(getDate());
+        return mMagnitude.toString();
     }
 
     @Override
     public String getSnippet() {
-        return mLocation;
+        return  "at " + new SimpleDateFormat("HH:mm").format(getDate());
     }
 }

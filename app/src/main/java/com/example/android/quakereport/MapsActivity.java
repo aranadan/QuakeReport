@@ -13,6 +13,7 @@ import com.google.maps.android.clustering.ClusterManager;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
+
     private GoogleMap mMap;
     private ClusterManager<Earthquake> mClusterManager;
 
@@ -28,6 +29,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Initialize the manager with the context and the map.
         // (Activity extends context, so we can pass 'this' in the constructor.)
         mClusterManager = new ClusterManager<Earthquake>(this, mMap);
+
     }
 
 

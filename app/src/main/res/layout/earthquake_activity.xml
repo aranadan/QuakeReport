@@ -15,36 +15,21 @@
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:paddingStart="16dp">
-
+<!--
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="36dp"
         android:orientation="horizontal"
         android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
         >
-
         <Spinner
             android:id="@+id/spinner"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:background="@drawable/magnitude_circle"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             />
-
-        <TextView
-            android:id="@+id/setDate"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:onClick="onClickChooseDate"
-            android:hint="Choose date"
-            android:inputType="date"
-            android:textSize="18sp"
-            android:textColor="@color/colorPrimary"
-            android:gravity="end"/>
-
-
-    </LinearLayout>
+    </LinearLayout>-->
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_container"
@@ -58,7 +43,8 @@
             android:layout_height="match_parent"
             android:divider="@null"
             android:dividerHeight="0dp"
-            android:orientation="vertical"></ListView>
+            android:orientation="vertical">
+        </ListView>
 
     </android.support.v4.widget.SwipeRefreshLayout>
 
@@ -67,9 +53,9 @@
     <android.support.design.widget.FloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right"
+        android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:src="@drawable/common_full_open_on_phone"
+        android:src="@mipmap/ic_map"
         app:layout_anchor="@id/list"
         app:layout_anchorGravity="bottom|end"
         android:id="@+id/fab"/>

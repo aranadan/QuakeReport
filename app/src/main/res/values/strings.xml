@@ -15,7 +15,8 @@
 <resources>
     <string name="app_name">Quake Report</string>
     <string name="action_settings">Scale</string>
-    <string-array name="scalelist">
+    <string name="title_activity_maps">Map</string>
+    <string-array name="scale_list">
         <item>1</item>
         <item>2</item>
         <item>3</item>
@@ -27,5 +28,5 @@
         <item>9</item>
         <item>10</item>
     </string-array>
-    <string name="title_activity_maps">Map</string>
+
 </resources>
