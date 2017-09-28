@@ -7,7 +7,7 @@
     <item
         android:id="@+id/action_set_mag"
         android:title="mag"
-        android:icon="@mipmap/ic_scale"
+        android:icon="@mipmap/ic_mag"
 
         app:showAsAction="ifRoom"/>
 

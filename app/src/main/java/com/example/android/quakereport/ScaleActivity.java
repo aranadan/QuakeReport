@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.widget.NumberPicker;
+import android.widget.Toast;
 
 public class ScaleActivity extends Activity {
 
@@ -19,6 +20,7 @@ public class ScaleActivity extends Activity {
         numberPicker.setMinValue(1);
         //disable infinite scrolling
         numberPicker.setWrapSelectorWheel(false);
+        Toast.makeText(ScaleActivity.this,"Select magnitude",Toast.LENGTH_SHORT).show();
         numberPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
