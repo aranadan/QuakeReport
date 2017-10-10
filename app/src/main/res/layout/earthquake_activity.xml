@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
+<FrameLayout
     android:id="@+id/main_content"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:fab="http://schemas.android.com/tools">
 
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -36,18 +37,20 @@
 </LinearLayout>
 
 
-    <android.support.design.widget.FloatingActionButton
+    <com.melnykov.fab.FloatingActionButton
+        android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:src="@mipmap/ic_map"
-        app:layout_anchor="@id/list"
-        app:layout_anchorGravity="bottom|end"
-        android:id="@+id/fab"
+        android:src = "@mipmap/ic_map"
+        fab:fab_colorNormal="@color/primary"
+        fab:fab_colorPressed="@color/primary_pressed"
+        fab:fab_colorRipple="@color/ripple"
+
         />
 
-</android.support.design.widget.CoordinatorLayout>
+</FrameLayout>
 
 
 
