@@ -228,12 +228,9 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
 
     private void initialize() {
 
-        //Spinner scaleSpinner = (Spinner) findViewById(R.id.spinner);
         earthquakeList = new ArrayList<>();
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
         swipeRefreshLayout.setOnRefreshListener(EarthquakeActivity.this);
-
-
 
         //set date
         date = new Date();

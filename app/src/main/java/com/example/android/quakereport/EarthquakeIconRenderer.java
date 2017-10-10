@@ -1,7 +1,6 @@
 package com.example.android.quakereport;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -9,26 +8,21 @@ import android.support.v4.content.ContextCompat;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
-/**
- * Created by admin on 22.09.2017.
- */
 
 public class EarthquakeIconRenderer extends DefaultClusterRenderer<Earthquake> {
 
     private Context context;
-    Paint p = new Paint();
+    private Paint p = new Paint();
 
     public EarthquakeIconRenderer(Context context, GoogleMap map, ClusterManager<Earthquake> clusterManager) {
         super(context, map, clusterManager);
         this.context = context;
     }
-
 
     @Override
     public Marker getMarker(Earthquake clusterItem) {
@@ -61,7 +55,6 @@ public class EarthquakeIconRenderer extends DefaultClusterRenderer<Earthquake> {
                 break;
         }
 
-
         // draw circle
         // diameter
         int d = 100;
@@ -71,12 +64,8 @@ public class EarthquakeIconRenderer extends DefaultClusterRenderer<Earthquake> {
         markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bm));
         markerOptions.alpha(0.8F);
 
-
-
-
         super.onBeforeClusterItemRendered(item, markerOptions);
 
     }
-
 
 }

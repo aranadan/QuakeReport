@@ -130,7 +130,6 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
      * Return the formatted date string (i.e. "Mar 3, 1984") from a Date object.
      */
     private String formatDate(Date dateObject) {
-        //SimpleDateFormat dateFormat = new SimpleDateFormat("LLL dd, yyyy");
         return EarthquakeActivity.dateFormat.format(dateObject);
     }
 
@@ -144,7 +143,6 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
 
     private String formatDecimal (Double magnitude){
         DecimalFormat decimalFormat = new DecimalFormat("0.0");
-        String output = decimalFormat.format(magnitude);
-        return output;
+        return decimalFormat.format(magnitude);
     }
 }
