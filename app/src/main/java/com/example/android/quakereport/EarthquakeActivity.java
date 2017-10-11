@@ -44,7 +44,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class EarthquakeActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
@@ -55,12 +62,14 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
     public static String URL;
     private String jsonStr;
     public static ArrayList<Earthquake> earthquakeList;
+    public static ArrayList<Quake> quakeList;
     public static ArrayList<Earthquake> spinnerArrayList = new ArrayList<>();
     private SwipeRefreshLayout swipeRefreshLayout;
     public static SimpleDateFormat dateFormat;
     private SimpleDateFormat getDateFormatForQuery;
     private ListView listView;
     private Date date;
+    Retrofit retrofit;
 
 
     @Override
@@ -69,7 +78,32 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         setContentView(R.layout.earthquake_activity);
         initialize();
         //download data and fill list
-        new GetJson().execute(getDateFormatForQuery.format(date));
+        //new GetJson().execute(getDateFormatForQuery.format(date));
+
+        String BASE_URL = "https://earthquake.usgs.gov/fdsnws/event/1/";
+        retrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        QuakeService service = retrofit.create(QuakeService.class);
+        Call<Quake> call = service.getQuery(1, "2017-10-10");
+        Log.e("URL: ", call.request().url().toString());
+        call.enqueue(new Callback<Quake>() {
+            @Override
+            public void onResponse(Call<Quake> call, Response<Quake> response) {
+                if (response.isSuccessful()){
+                    Quake q = response.body();
+                    for (int i =0; i < q.getFeatures().size(); i++)
+                    Log.e(TAG,q.getFeatures().get(i).getProperties().getPlace());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Quake> call, Throwable t) {
+                Log.e("ERROR:", (t.getMessage()));
+            }
+        });
+
     }
 
     @Override
@@ -102,7 +136,7 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
             URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minmagnitude="
                     + magnitude + "&starttime=" + date[0] + "T00:00:00" + "%2b03" + "&endtime=" + date[0] + "T23:59:59%2b03"; //%2b instead +
             // Making a request to URL and getting response
-            //Log.e(TAG,URL.toString());
+            Log.e(TAG,URL.toString());
             jsonStr = httpHandler.makeServiceCall(URL);
 
             if (jsonStr != null) {
