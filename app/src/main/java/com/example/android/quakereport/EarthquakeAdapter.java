@@ -19,9 +19,9 @@ import java.util.ArrayList;
 import java.util.Date;
 
 
-public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
+public class EarthquakeAdapter extends ArrayAdapter<Feature> {
 
-    public EarthquakeAdapter(Context context, ArrayList<Earthquake> earthquakes) {
+    public EarthquakeAdapter(Context context, ArrayList<Feature> earthquakes) {
         super(context, 0, earthquakes);
     }
 
@@ -34,11 +34,11 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
             listItemView = LayoutInflater.from(this.getContext()).inflate(layout.activity_earthquake_list_item, parent, false);
         }
         //Find earthquake at the given position in the list
-        Earthquake currentEarthquake = this.getItem(position);
+        Feature feature = this.getItem(position);
 
         //Find the TextView with view ID magnitude
         TextView magnitudeView = (TextView) listItemView.findViewById(id.magnitude);
-        magnitudeView.setText(this.formatDecimal(currentEarthquake.getMagnitude()));
+        magnitudeView.setText(this.formatDecimal(feature.getProperties().getMag()));
 
         //Find the TextView with view ID location
         TextView locationView = (TextView) listItemView.findViewById(id.location);
@@ -47,7 +47,7 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
         TextView offsetView = (TextView) listItemView.findViewById(id.offset);
 
         //Split location on two TextView fields
-        String fullLocation = currentEarthquake.getLocation();
+        String fullLocation = feature.getProperties().getPlace();
 
         if (fullLocation.contains("of")) {
             int indexDivision = fullLocation.indexOf("of") + 3;
@@ -63,7 +63,7 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
         }
 
         // Create a new Date object from the time in milliseconds of the earthquake
-        Date dateObject = currentEarthquake.getDate();
+        Date dateObject = feature.getProperties().getDate();
 
         //Find the TextView with view ID date
         TextView dateView = (TextView) listItemView.findViewById(id.date);
@@ -77,8 +77,8 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
         GradientDrawable magnitudeCircle = (GradientDrawable) magnitudeView.getBackground();
 
         // Get the appropriate background color based on the current earthquake magnitude
-        int magnitudeColor = this.getMagnitudeColor(currentEarthquake.getMagnitude());
-        currentEarthquake.setMagColor(magnitudeColor);
+        int magnitudeColor = this.getMagnitudeColor(feature.getProperties().getMag());
+        feature.getProperties().setMagColor(magnitudeColor);
 
         // Set the color on the magnitude circle
         magnitudeCircle.setColor(magnitudeColor);

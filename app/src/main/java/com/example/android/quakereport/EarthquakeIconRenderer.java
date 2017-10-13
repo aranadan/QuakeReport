@@ -14,25 +14,25 @@ import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
 
-public class EarthquakeIconRenderer extends DefaultClusterRenderer<Earthquake> {
+public class EarthquakeIconRenderer extends DefaultClusterRenderer<Feature> {
 
     private Context context;
     private Paint p = new Paint();
 
-    public EarthquakeIconRenderer(Context context, GoogleMap map, ClusterManager<Earthquake> clusterManager) {
+    public EarthquakeIconRenderer(Context context, GoogleMap map, ClusterManager<Feature> clusterManager) {
         super(context, map, clusterManager);
         this.context = context;
     }
 
     @Override
-    public Marker getMarker(Earthquake clusterItem) {
+    public Marker getMarker(Feature clusterItem) {
         return super.getMarker(clusterItem);
     }
 
     @Override
-    protected void onBeforeClusterItemRendered(Earthquake item, MarkerOptions markerOptions) {
+    protected void onBeforeClusterItemRendered(Feature item, MarkerOptions markerOptions) {
 
-        int magnitudeFloor = (int) Math.floor(item.getMagnitude());
+        int magnitudeFloor = (int) Math.floor(item.getProperties().getMag());
 
         switch (magnitudeFloor){
             case 1: p.setColor(ContextCompat.getColor(context, R.color.magnitude1));

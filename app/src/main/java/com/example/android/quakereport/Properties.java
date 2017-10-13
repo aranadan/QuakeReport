@@ -4,6 +4,8 @@ package com.example.android.quakereport;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Date;
+
 public class Properties {
 
     @SerializedName("mag")
@@ -15,7 +17,23 @@ public class Properties {
     @SerializedName("time")
     @Expose
     private Long time;
+    @SerializedName("url")
+    @Expose
+    private String url;
 
+    public String getUrl() {
+        return url;
+    }
+
+    private int magColor;
+
+    public int getMagColor() {
+        return magColor;
+    }
+
+    public void setMagColor(int magColor) {
+        this.magColor = magColor;
+    }
 
     public Double getMag() {
         return mag;
@@ -35,6 +53,10 @@ public class Properties {
 
     public Long getTime() {
         return time;
+    }
+
+    public Date getDate() {
+        return new Date(time);
     }
 
     public void setTime(Long time) {

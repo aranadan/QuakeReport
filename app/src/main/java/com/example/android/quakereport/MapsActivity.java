@@ -15,7 +15,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     private GoogleMap mMap;
-    private ClusterManager<Earthquake> mClusterManager;
+    private ClusterManager<Feature> mClusterManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,7 +28,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Initialize the manager with the context and the map.
         // (Activity extends context, so we can pass 'this' in the constructor.)
-        mClusterManager = new ClusterManager<Earthquake>(this, mMap);
+        mClusterManager = new ClusterManager<Feature>(this, mMap);
 
     }
 
@@ -44,7 +44,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Initialize the manager with the context and the map.
         // (Activity extends context, so we can pass 'this' in the constructor.)
-        mClusterManager = new ClusterManager<Earthquake>(this, mMap);
+        mClusterManager = new ClusterManager<Feature>(this, mMap);
         mClusterManager.setRenderer(new EarthquakeIconRenderer(this.getApplicationContext(),mMap,mClusterManager));
 
         // Point the map's listeners at the listeners implemented by the cluster
@@ -54,12 +54,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Add cluster items (markers) to the cluster manager.
         addItems();
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(EarthquakeActivity.spinnerArrayList.get(0).getPosition()));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(EarthquakeActivity.filteredListByMag.get(0).getPosition()));
     }
 
     private void addItems() {
         // Add cluster items in close proximity
-        for (Earthquake item : EarthquakeActivity.spinnerArrayList) {
+        for (Feature item : EarthquakeActivity.filteredListByMag) {
             mClusterManager.addItem(item);
         }
     }
