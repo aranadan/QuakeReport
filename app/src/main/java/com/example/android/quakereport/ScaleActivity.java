@@ -27,8 +27,8 @@ public class ScaleActivity extends Activity {
 
 
                 EarthquakeActivity.magnitude = newVal;
-                //Vibrate for 30milliseconds
-                vibrator.vibrate(30);
+                //Vibrate for 20milliseconds
+                vibrator.vibrate(20);
             }
         });
 

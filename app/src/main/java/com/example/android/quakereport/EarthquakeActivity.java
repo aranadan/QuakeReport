@@ -22,18 +22,19 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.DatePicker;
-import android.widget.ListView;
 import android.widget.Toast;
 
-import com.melnykov.fab.FloatingActionButton;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -48,6 +49,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 
+
 public class EarthquakeActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
     public static int magnitude = 1;
@@ -57,9 +59,10 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
     private SwipeRefreshLayout swipeRefreshLayout;
     public static SimpleDateFormat dateFormat;
     private SimpleDateFormat getDateFormatForQuery;
-    private ListView listView;
+    private RecyclerView recyclerView;
     private Date date;
     private Quake quake;
+    private FloatingActionButton fab;
 
 
     @Override
@@ -172,7 +175,8 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
             }
         }
         //set adapter to list
-        listView.setAdapter(new EarthquakeAdapter(EarthquakeActivity.this, filteredListByMag));
+        //recyclerView.setAdapter(new EarthquakeAdapter(EarthquakeActivity.this, filteredListByMag));
+        recyclerView.setAdapter(new PropertiesAdapter(filteredListByMag));
     }
 
     private void initialize() {
@@ -187,8 +191,34 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         dateFormat = new SimpleDateFormat("LLL dd, yyyy", Locale.UK);
         getDateFormatForQuery = new SimpleDateFormat("yyyy-MM-dd", Locale.UK);
 
-        listView = (ListView) findViewById(R.id.list);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        recyclerView = (RecyclerView) findViewById(R.id.list);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(new PropertiesAdapter(featureList));
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener(){
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+
+                if (newState == RecyclerView.SCROLL_STATE_IDLE)
+                {
+                    fab.show();
+                }
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                if (dy > 0 || dy < 0 && fab.isShown())
+                {
+                    fab.hide();
+                }
+            }
+        });
+
+
+        /*recyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 //create intent to call the browser
@@ -196,12 +226,13 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
                 //call activity
                 startActivity(intentCallWeb);
             }
-        });
+        });*/
+
 
         //floating action button to start map activity
-        FloatingActionButton fabCallMaps = (FloatingActionButton) findViewById(R.id.fab);
-        fabCallMaps.attachToListView(listView);
-        fabCallMaps.setOnClickListener(new View.OnClickListener() {
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+        //fab.attachToListView(recyclerView);
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intentMaps = new Intent(EarthquakeActivity.this, MapsActivity.class);

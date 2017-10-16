@@ -1,6 +1,9 @@
 
 package com.example.android.quakereport;
 
+import android.content.Context;
+import android.support.v4.content.ContextCompat;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -27,9 +30,6 @@ public class Properties {
 
     private int magColor;
 
-    public int getMagColor() {
-        return magColor;
-    }
 
     public void setMagColor(int magColor) {
         this.magColor = magColor;
@@ -61,6 +61,47 @@ public class Properties {
 
     public void setTime(Long time) {
         this.time = time;
+    }
+
+
+    public int getMagColor( Context context) {
+        int output;
+        //Возвращает наибольшее целое, меньшее или равное аргументу
+        int magnitudeFloor = (int) Math.floor(mag);
+        switch (magnitudeFloor){
+            case 0:
+            case 1:
+                output = ContextCompat.getColor(context, R.color.magnitude1);
+                break;
+            case 2:
+                output = ContextCompat.getColor(context, R.color.magnitude2);
+                break;
+            case 3:
+                output = ContextCompat.getColor(context, R.color.magnitude3);
+                break;
+            case 4:
+                output = ContextCompat.getColor(context, R.color.magnitude4);
+                break;
+            case 5:
+                output = ContextCompat.getColor(context, R.color.magnitude5);
+                break;
+            case 6:
+                output = ContextCompat.getColor(context, R.color.magnitude6);
+                break;
+            case 7:
+                output = ContextCompat.getColor(context, R.color.magnitude7);
+                break;
+            case 8:
+                output = ContextCompat.getColor(context, R.color.magnitude8);
+                break;
+            case 9:
+                output = ContextCompat.getColor(context, R.color.magnitude9);
+                break;
+            default:
+                output = ContextCompat.getColor(context, R.color.magnitude10plus);
+                break;
+        }
+        return output;
     }
 
 }
