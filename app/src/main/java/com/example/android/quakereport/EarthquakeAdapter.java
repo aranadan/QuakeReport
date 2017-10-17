@@ -36,7 +36,7 @@ public class EarthquakeAdapter extends ArrayAdapter<Feature> {
         //Find earthquake at the given position in the list
         Feature feature = this.getItem(position);
 
-        //Find the TextView with view ID magnitude
+        //Find the TextView with view ID MAGNITUDE
         TextView magnitudeView = (TextView) listItemView.findViewById(id.magnitude);
         magnitudeView.setText(this.formatDecimal(feature.getProperties().getMag()));
 
@@ -72,15 +72,15 @@ public class EarthquakeAdapter extends ArrayAdapter<Feature> {
         TextView timeView = (TextView) listItemView.findViewById(id.time);
         timeView.setText(this.formatTime(dateObject));
 
-        // Set the proper background color on the magnitude circle.
+        // Set the proper background color on the MAGNITUDE circle.
         // Fetch the background from the TextView, which is a GradientDrawable.
         GradientDrawable magnitudeCircle = (GradientDrawable) magnitudeView.getBackground();
 
-        // Get the appropriate background color based on the current earthquake magnitude
+        // Get the appropriate background color based on the current earthquake MAGNITUDE
         int magnitudeColor = this.getMagnitudeColor(feature.getProperties().getMag());
         feature.getProperties().setMagColor(magnitudeColor);
 
-        // Set the color on the magnitude circle
+        // Set the color on the MAGNITUDE circle
         magnitudeCircle.setColor(magnitudeColor);
 
         return listItemView;
@@ -130,7 +130,7 @@ public class EarthquakeAdapter extends ArrayAdapter<Feature> {
      * Return the formatted date string (i.e. "Mar 3, 1984") from a Date object.
      */
     private String formatDate(Date dateObject) {
-        return EarthquakeActivity.dateFormat.format(dateObject);
+        return EarthquakeActivity.DATE_FORMAT.format(dateObject);
     }
 
     /**

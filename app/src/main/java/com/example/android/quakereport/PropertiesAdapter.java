@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,7 +49,7 @@ public class PropertiesAdapter extends RecyclerView.Adapter<PropertiesAdapter.Vi
             }
         });
 
-        holder.date.setText(EarthquakeActivity.dateFormat.format(new Date(properties.getTime())));
+        holder.date.setText(EarthquakeActivity.DATE_FORMAT.format(new Date(properties.getTime())));
         holder.time.setText(new SimpleDateFormat("HH:mm").format(new Date(properties.getTime())));
 
         if (properties.getPlace().contains("of")) {
@@ -66,10 +65,10 @@ public class PropertiesAdapter extends RecyclerView.Adapter<PropertiesAdapter.Vi
             holder.offset.setText(properties.getPlace());
         }
 
-        // Get the appropriate background color based on the current earthquake magnitude
-        // Set the color on the magnitude circle
+        // Get the appropriate background color based on the current earthquake MAGNITUDE
+        // Set the color on the MAGNITUDE circle
         holder.mag.setText(properties.getMag().toString());
-        // Set the proper background color on the magnitude circle.
+        // Set the proper background color on the MAGNITUDE circle.
         // Fetch the background from the TextView, which is a GradientDrawable.
         GradientDrawable magnitudeCircle = (GradientDrawable) holder.mag.getBackground();
         magnitudeCircle.setColor(properties.getMagColor(context));

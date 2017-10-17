@@ -54,12 +54,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Add cluster items (markers) to the cluster manager.
         addItems();
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(EarthquakeActivity.filteredListByMag.get(0).getPosition()));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(EarthquakeActivity.FILTERED_LIST_BY_MAG.get(0).getPosition()));
     }
 
     private void addItems() {
         // Add cluster items in close proximity
-        for (Feature item : EarthquakeActivity.filteredListByMag) {
+        for (Feature item : EarthquakeActivity.FILTERED_LIST_BY_MAG) {
             mClusterManager.addItem(item);
         }
     }

@@ -20,13 +20,13 @@ public class ScaleActivity extends Activity {
         numberPicker.setMinValue(1);
         //disable infinite scrolling
         numberPicker.setWrapSelectorWheel(false);
-        Toast.makeText(ScaleActivity.this,"Select magnitude",Toast.LENGTH_SHORT).show();
+        Toast.makeText(ScaleActivity.this,"Select MAGNITUDE",Toast.LENGTH_SHORT).show();
         numberPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
 
 
-                EarthquakeActivity.magnitude = newVal;
+                EarthquakeActivity.MAGNITUDE = newVal;
                 //Vibrate for 20milliseconds
                 vibrator.vibrate(20);
             }

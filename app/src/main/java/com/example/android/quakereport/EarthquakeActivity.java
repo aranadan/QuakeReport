@@ -1,18 +1,3 @@
-/*
- * Copyright (C) 2016 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.example.android.quakereport;
 
 import android.app.DatePickerDialog;
@@ -20,7 +5,6 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -30,7 +14,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.Toast;
@@ -52,12 +35,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class EarthquakeActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
-    public static int magnitude = 1;
-    //URL to get JSON Array
-    public static ArrayList<Feature> featureList;
-    public static ArrayList<Feature> filteredListByMag;
+    public static int MAGNITUDE = 1;
+    public static ArrayList<Feature> FEATURE_LIST;
+    public static ArrayList<Feature> FILTERED_LIST_BY_MAG;
+    public static SimpleDateFormat DATE_FORMAT;
+
     private SwipeRefreshLayout swipeRefreshLayout;
-    public static SimpleDateFormat dateFormat;
     private SimpleDateFormat getDateFormatForQuery;
     private RecyclerView recyclerView;
     private Date date;
@@ -82,16 +65,16 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
                 .build();
 
         QuakeService service = retrofit.create(QuakeService.class);
-        Call<Quake> call = service.getQuery(magnitude, getDateFormatForQuery.format(date));
+        Call<Quake> call = service.getQuery(MAGNITUDE, getDateFormatForQuery.format(date));
         Log.e("URL: ", call.request().url().toString());
         call.enqueue(new Callback<Quake>() {
             @Override
             public void onResponse(Call<Quake> call, Response<Quake> response) {
 
                 if (response.isSuccessful()) {
-                    featureList.clear();
+                    FEATURE_LIST.clear();
                     quake = response.body();
-                    featureList.addAll(quake.getFeatures());
+                    FEATURE_LIST.addAll(quake.getFeatures());
                     filterListByMagnitude();
                 }
             }
@@ -166,35 +149,35 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         //jsonStr = sPref.getString("data", "");
     }
 
-    //filter list by setting min magnitude
+    //filter list by setting min MAGNITUDE
     private void filterListByMagnitude() {
-        filteredListByMag.clear();
-        for (Feature earthquake : featureList) {
-            if (earthquake.getProperties().getMag() >= (double) magnitude) {
-                filteredListByMag.add(earthquake);
+        FILTERED_LIST_BY_MAG.clear();
+        for (Feature earthquake : FEATURE_LIST) {
+            if (earthquake.getProperties().getMag() >= (double) MAGNITUDE) {
+                FILTERED_LIST_BY_MAG.add(earthquake);
             }
         }
         //set adapter to list
-        //recyclerView.setAdapter(new EarthquakeAdapter(EarthquakeActivity.this, filteredListByMag));
-        recyclerView.setAdapter(new PropertiesAdapter(filteredListByMag));
+        //recyclerView.setAdapter(new EarthquakeAdapter(EarthquakeActivity.this, FILTERED_LIST_BY_MAG));
+        recyclerView.setAdapter(new PropertiesAdapter(FILTERED_LIST_BY_MAG));
     }
 
     private void initialize() {
-        featureList = new ArrayList<>();
-        filteredListByMag = new ArrayList<>();
+        FEATURE_LIST = new ArrayList<>();
+        FILTERED_LIST_BY_MAG = new ArrayList<>();
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
         swipeRefreshLayout.setOnRefreshListener(EarthquakeActivity.this);
 
         //set date
         date = new Date();
-        dateFormat = new SimpleDateFormat("LLL dd, yyyy", Locale.UK);
+        DATE_FORMAT = new SimpleDateFormat("LLL dd, yyyy", Locale.UK);
         getDateFormatForQuery = new SimpleDateFormat("yyyy-MM-dd", Locale.UK);
 
         recyclerView = (RecyclerView) findViewById(R.id.list);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(new PropertiesAdapter(featureList));
+        recyclerView.setAdapter(new PropertiesAdapter(FEATURE_LIST));
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener(){
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -222,7 +205,7 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 //create intent to call the browser
-                Intent intentCallWeb = new Intent(Intent.ACTION_VIEW, Uri.parse(filteredListByMag.get(i).getProperties().getUrl()));
+                Intent intentCallWeb = new Intent(Intent.ACTION_VIEW, Uri.parse(FILTERED_LIST_BY_MAG.get(i).getProperties().getUrl()));
                 //call activity
                 startActivity(intentCallWeb);
             }
