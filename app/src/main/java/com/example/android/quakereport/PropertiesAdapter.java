@@ -13,16 +13,14 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-/**
- * Created by andrey on 15.10.17.
- */
 
 public class PropertiesAdapter extends RecyclerView.Adapter<PropertiesAdapter.ViewHolder> {
-        private ArrayList<Feature> list;
+        private List<Feature> list;
     Context context;
 
-    public PropertiesAdapter(ArrayList<Feature> list) {
+    public PropertiesAdapter(List<Feature> list) {
         this.list = list;
     }
 

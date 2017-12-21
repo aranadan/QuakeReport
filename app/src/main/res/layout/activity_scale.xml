@@ -6,10 +6,10 @@
 
     <NumberPicker
         android:id="@+id/numberPicker"
-        android:layout_width="250dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
         android:descendantFocusability="blocksDescendants"
+
         />
 
 

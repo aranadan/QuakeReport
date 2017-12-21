@@ -16,6 +16,8 @@
     <string name="app_name">Quake Report</string>
     <string name="action_settings">Scale</string>
     <string name="title_activity_maps">Map</string>
+    <string name="set_scale">Select Scale</string>
+    <string name="instagram_access_token">1538323172.1677ed0.dfeaf63fd88747fb9926976e91a0592f</string>
 
 
 </resources>

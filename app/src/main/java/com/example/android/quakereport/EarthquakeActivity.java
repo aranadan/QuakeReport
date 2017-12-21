@@ -3,6 +3,7 @@ package com.example.android.quakereport;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -18,11 +19,11 @@ import android.view.View;
 import android.widget.DatePicker;
 import android.widget.Toast;
 
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import retrofit2.Call;
@@ -33,11 +34,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 
 
-public class EarthquakeActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
+public class EarthquakeActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, OnDataPass {
 
-    public static int MAGNITUDE = 1;
-    public static ArrayList<Feature> FEATURE_LIST;
-    public static ArrayList<Feature> FILTERED_LIST_BY_MAG;
+    private int magnitude = 1;
+    public static List<Feature> FEATURE_LIST;
+    public static List<Feature> FILTERED_LIST_BY_MAG;
     public static SimpleDateFormat DATE_FORMAT;
 
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -65,7 +66,7 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
                 .build();
 
         QuakeService service = retrofit.create(QuakeService.class);
-        Call<Quake> call = service.getQuery(MAGNITUDE, getDateFormatForQuery.format(date));
+        Call<Quake> call = service.getQuery(magnitude, getDateFormatForQuery.format(date));
         Log.e("URL: ", call.request().url().toString());
         call.enqueue(new Callback<Quake>() {
             @Override
@@ -109,15 +110,11 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         dialogFragment.show(getFragmentManager(), "dialogFragment");
     }
 
-
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        //save data to phone
-        SharedPreferences sPref = getSharedPreferences("MyPref", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sPref.edit();
-        //editor.putString("data", quake);
-        editor.apply();
+    public void onDataPass(int selectedScale) {
+        magnitude = selectedScale;
+        filterListByMagnitude();
+
     }
 
     private class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
@@ -144,21 +141,16 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         }
     }
 
-    private void loadDataFromSD() {
-        SharedPreferences sPref = getSharedPreferences("MyPref", MODE_PRIVATE);
-        //jsonStr = sPref.getString("data", "");
-    }
 
-    //filter list by setting min MAGNITUDE
+    //filter list by setting min magnitude
     private void filterListByMagnitude() {
         FILTERED_LIST_BY_MAG.clear();
         for (Feature earthquake : FEATURE_LIST) {
-            if (earthquake.getProperties().getMag() >= (double) MAGNITUDE) {
+            if (earthquake.getProperties().getMag() >= (double) magnitude) {
                 FILTERED_LIST_BY_MAG.add(earthquake);
             }
         }
         //set adapter to list
-        //recyclerView.setAdapter(new EarthquakeAdapter(EarthquakeActivity.this, FILTERED_LIST_BY_MAG));
         recyclerView.setAdapter(new PropertiesAdapter(FILTERED_LIST_BY_MAG));
     }
 
@@ -201,17 +193,6 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         });
 
 
-        /*recyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                //create intent to call the browser
-                Intent intentCallWeb = new Intent(Intent.ACTION_VIEW, Uri.parse(FILTERED_LIST_BY_MAG.get(i).getProperties().getUrl()));
-                //call activity
-                startActivity(intentCallWeb);
-            }
-        });*/
-
-
         //floating action button to start map activity
         fab = (FloatingActionButton) findViewById(R.id.fab);
         //fab.attachToListView(recyclerView);
@@ -230,8 +211,8 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         switch (item.getItemId()) {
             case R.id.action_set_mag:
 
-                Intent scaleIntent = new Intent(EarthquakeActivity.this, ScaleActivity.class);
-                startActivityForResult(scaleIntent, 1);
+                FragmentManager managet = getFragmentManager();
+                new ScaleFragment().show(managet, "ScaleFragment");
                 return true;
 
             case R.id.action_set_date:
@@ -242,10 +223,6 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-            filterListByMagnitude();
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -253,6 +230,7 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         getMenuInflater().inflate(R.menu.menu, menu);//Menu Resource, Menu
         return true;
     }
+
 }
 
 

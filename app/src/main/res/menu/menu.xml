@@ -8,7 +8,6 @@
         android:id="@+id/action_set_mag"
         android:title="mag"
         android:icon="@mipmap/ic_mag"
-
         app:showAsAction="ifRoom"/>
 
     <!-- Settings, should always be in the overflow -->
@@ -17,9 +16,5 @@
         android:icon="@mipmap/ic_calendar"
         app:showAsAction="ifRoom"
         />
-
-
-
-
 
 </menu>
