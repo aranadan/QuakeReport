@@ -5,19 +5,16 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
-import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -26,12 +23,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
-
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 
 public class EarthquakeActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, OnDataPass {
@@ -47,7 +44,9 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
     private Date date;
     private Quake quake;
     private FloatingActionButton fab;
-
+    private Observable<Quake> mQuakeObservable;
+    private Observable<Feature> mFeatureObservable;
+    private PropertiesAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,13 +60,23 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
     private void retrofitRequest() {
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://earthquake.usgs.gov/fdsnws/event/1/")
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
+                .baseUrl("https://earthquake.usgs.gov/fdsnws/event/1/")
                 .build();
 
         QuakeService service = retrofit.create(QuakeService.class);
-        Call<Quake> call = service.getQuery(magnitude, getDateFormatForQuery.format(date));
-        Log.e("URL: ", call.request().url().toString());
+
+        mQuakeObservable = service.getQuery(magnitude, getDateFormatForQuery.format(date));
+        mQuakeObservable.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(quake -> {
+                    FEATURE_LIST.addAll(quake.getFeatures());
+                    filterListByMagnitude();
+                });
+
+
+        /*Log.e("URL: ", call.request().url().toString());
         call.enqueue(new Callback<Quake>() {
             @Override
             public void onResponse(Call<Quake> call, Response<Quake> response) {
@@ -85,7 +94,7 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
                 Log.e("ERROR:", (t.getMessage()));
                 Toast.makeText(EarthquakeActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
             }
-        });
+        });*/
     }
 
     @Override
@@ -113,7 +122,8 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
     @Override
     public void onDataPass(int selectedScale) {
         magnitude = selectedScale;
-        filterListByMagnitude();
+        //filterListByMagnitude();
+        mAdapter.notifyDataSetChanged();
 
     }
 
@@ -157,6 +167,7 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
     private void initialize() {
         FEATURE_LIST = new ArrayList<>();
         FILTERED_LIST_BY_MAG = new ArrayList<>();
+        mAdapter = new PropertiesAdapter(FEATURE_LIST);
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
         swipeRefreshLayout.setOnRefreshListener(EarthquakeActivity.this);
@@ -211,8 +222,8 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         switch (item.getItemId()) {
             case R.id.action_set_mag:
 
-                FragmentManager managet = getFragmentManager();
-                new ScaleFragment().show(managet, "ScaleFragment");
+                FragmentManager manager = getFragmentManager();
+                new ScaleFragment().show(manager, "ScaleFragment");
                 return true;
 
             case R.id.action_set_date:
