@@ -1,16 +1,20 @@
 package com.example.android.quakereport;
 
+import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,19 +26,22 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action0;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 
 public class EarthquakeActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, OnDataPass {
 
-    private int magnitude = 1;
-    public static List<Feature> FEATURE_LIST;
+    private int magnitude;
+    private  List<Feature> featureList;
     public static List<Feature> FILTERED_LIST_BY_MAG;
     public static SimpleDateFormat DATE_FORMAT;
 
@@ -42,10 +49,7 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
     private SimpleDateFormat getDateFormatForQuery;
     private RecyclerView recyclerView;
     private Date date;
-    private Quake quake;
     private FloatingActionButton fab;
-    private Observable<Quake> mQuakeObservable;
-    private Observable<Feature> mFeatureObservable;
     private PropertiesAdapter mAdapter;
 
     @Override
@@ -58,7 +62,7 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
     }
 
     private void retrofitRequest() {
-
+        featureList.clear();
         Retrofit retrofit = new Retrofit.Builder()
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
@@ -67,34 +71,19 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
 
         QuakeService service = retrofit.create(QuakeService.class);
 
-        mQuakeObservable = service.getQuery(magnitude, getDateFormatForQuery.format(date));
-        mQuakeObservable.subscribeOn(Schedulers.io())
+        Observable<Quake> mQuakeObservable = service.getQuery(1, getDateFormatForQuery.format(date));
+        mQuakeObservable
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(quake -> {
-                    FEATURE_LIST.addAll(quake.getFeatures());
-                    filterListByMagnitude();
-                });
-
-
-        /*Log.e("URL: ", call.request().url().toString());
-        call.enqueue(new Callback<Quake>() {
-            @Override
-            public void onResponse(Call<Quake> call, Response<Quake> response) {
-
-                if (response.isSuccessful()) {
-                    FEATURE_LIST.clear();
-                    quake = response.body();
-                    FEATURE_LIST.addAll(quake.getFeatures());
-                    filterListByMagnitude();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Quake> call, Throwable t) {
-                Log.e("ERROR:", (t.getMessage()));
-                Toast.makeText(EarthquakeActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });*/
+                .flatMap(quake -> Observable.from(quake.getFeatures()))
+                //.filter(feature -> feature.getProperties().getMag()>= magnitude)
+                .subscribe(
+                        //fill objects to list
+                        q -> featureList.add(q)
+                        //on error action
+                      ,throwable -> {}
+                        //on complete action
+                      ,() ->filterListByMagnitude());
     }
 
     @Override
@@ -102,14 +91,10 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         // start show progress
         swipeRefreshLayout.setRefreshing(true);
         // wait 1 second and hide progress
-        swipeRefreshLayout.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                swipeRefreshLayout.setRefreshing(false);
-                //download data and fill list
-                retrofitRequest();
-            }
-
+        swipeRefreshLayout.postDelayed(() -> {
+            swipeRefreshLayout.setRefreshing(false);
+            //download data and fill list
+            retrofitRequest();
         }, 1000);
     }
 
@@ -119,12 +104,11 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         dialogFragment.show(getFragmentManager(), "dialogFragment");
     }
 
+
     @Override
     public void onDataPass(int selectedScale) {
         magnitude = selectedScale;
-        //filterListByMagnitude();
-        mAdapter.notifyDataSetChanged();
-
+        filterListByMagnitude();
     }
 
     private class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
@@ -155,19 +139,19 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
     //filter list by setting min magnitude
     private void filterListByMagnitude() {
         FILTERED_LIST_BY_MAG.clear();
-        for (Feature earthquake : FEATURE_LIST) {
-            if (earthquake.getProperties().getMag() >= (double) magnitude) {
-                FILTERED_LIST_BY_MAG.add(earthquake);
-            }
-        }
-        //set adapter to list
-        recyclerView.setAdapter(new PropertiesAdapter(FILTERED_LIST_BY_MAG));
+        FILTERED_LIST_BY_MAG
+                .addAll(featureList.stream()
+                .filter(feature -> feature.getProperties().getMag() >= magnitude)
+                .collect(Collectors.toList()));
+
+        mAdapter.notifyDataSetChanged();
     }
 
     private void initialize() {
-        FEATURE_LIST = new ArrayList<>();
+        magnitude = 1;
+        featureList = new ArrayList<>();
         FILTERED_LIST_BY_MAG = new ArrayList<>();
-        mAdapter = new PropertiesAdapter(FEATURE_LIST);
+        mAdapter = new PropertiesAdapter(FILTERED_LIST_BY_MAG);
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
         swipeRefreshLayout.setOnRefreshListener(EarthquakeActivity.this);
@@ -180,7 +164,7 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         recyclerView = (RecyclerView) findViewById(R.id.list);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(new PropertiesAdapter(FEATURE_LIST));
+        recyclerView.setAdapter(mAdapter);
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener(){
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -207,12 +191,9 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         //floating action button to start map activity
         fab = (FloatingActionButton) findViewById(R.id.fab);
         //fab.attachToListView(recyclerView);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intentMaps = new Intent(EarthquakeActivity.this, MapsActivity.class);
-                startActivity(intentMaps);
-            }
+        fab.setOnClickListener(view -> {
+            Intent intentMaps = new Intent(EarthquakeActivity.this, MapsActivity.class);
+            startActivity(intentMaps);
         });
     }
 
