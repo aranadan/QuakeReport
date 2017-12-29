@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -38,13 +37,10 @@ public class PropertiesAdapter extends RecyclerView.Adapter<PropertiesAdapter.Vi
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         final Properties properties = list.get(position).getProperties();
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intentCallWeb = new Intent(Intent.ACTION_VIEW, Uri.parse(properties.getUrl()));
-                //call activity
-                context.startActivity(intentCallWeb);
-            }
+        holder.itemView.setOnClickListener(view -> {
+            Intent intentCallWeb = new Intent(Intent.ACTION_VIEW, Uri.parse(properties.getUrl()));
+            //call activity
+            context.startActivity(intentCallWeb);
         });
 
         holder.date.setText(EarthquakeActivity.DATE_FORMAT.format(new Date(properties.getTime())));

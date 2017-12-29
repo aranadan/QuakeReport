@@ -1,23 +1,18 @@
 package com.example.android.quakereport;
 
-import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.DatePicker;
 
 import java.text.SimpleDateFormat;
@@ -26,22 +21,19 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action0;
-import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 
 public class EarthquakeActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, OnDataPass {
 
     private int magnitude;
-    private  List<Feature> featureList;
+    private List<Feature> featureList;
     public static List<Feature> FILTERED_LIST_BY_MAG;
     public static SimpleDateFormat DATE_FORMAT;
 
@@ -76,14 +68,14 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .flatMap(quake -> Observable.from(quake.getFeatures()))
-                //.filter(feature -> feature.getProperties().getMag()>= magnitude)
                 .subscribe(
                         //fill objects to list
                         q -> featureList.add(q)
                         //on error action
-                      ,throwable -> {}
+                        , throwable -> {
+                        }
                         //on complete action
-                      ,() ->filterListByMagnitude());
+                        , this::filterListByMagnitude);
     }
 
     @Override
@@ -108,12 +100,14 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
     @Override
     public void onDataPass(int selectedScale) {
         magnitude = selectedScale;
-        filterListByMagnitude();
+        //filterListByMagnitude();
+        retrofitRequest();
     }
 
     private class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 
-        public DatePickerFragment() {}
+        public DatePickerFragment() {
+        }
 
         @Override
         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
@@ -139,11 +133,14 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
     //filter list by setting min magnitude
     private void filterListByMagnitude() {
         FILTERED_LIST_BY_MAG.clear();
-        FILTERED_LIST_BY_MAG
+        /*FILTERED_LIST_BY_MAG
                 .addAll(featureList.stream()
                 .filter(feature -> feature.getProperties().getMag() >= magnitude)
-                .collect(Collectors.toList()));
-
+                .collect(Collectors.toList()));*/
+        for (Feature feature : featureList) {
+            if (feature.getProperties().getMag() >= magnitude)
+                FILTERED_LIST_BY_MAG.add(feature);
+        }
         mAdapter.notifyDataSetChanged();
     }
 
@@ -165,13 +162,12 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(mAdapter);
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener(){
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
 
-                if (newState == RecyclerView.SCROLL_STATE_IDLE)
-                {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                     fab.show();
                 }
             }
@@ -180,8 +176,7 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
 
-                if (dy > 0 || dy < 0 && fab.isShown())
-                {
+                if (dy > 0 || dy < 0 && fab.isShown()) {
                     fab.hide();
                 }
             }
