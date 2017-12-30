@@ -24,11 +24,11 @@ public class ScaleFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        View view = LayoutInflater.from(getActivity()).inflate(R.layout.activity_scale, null);
+        View view = LayoutInflater.from(getActivity()).inflate(R.layout.number_picker, null);
 
         final Vibrator vibrator = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
 
-        final NumberPicker numberPicker = (NumberPicker) view.findViewById(R.id.numberPicker);
+        final NumberPicker numberPicker = (NumberPicker) view.findViewById(R.id.number_picker);
         numberPicker.setMaxValue(10);
         numberPicker.setMinValue(1);
         //disable infinite scrolling

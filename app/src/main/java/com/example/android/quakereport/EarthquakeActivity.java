@@ -1,8 +1,5 @@
 package com.example.android.quakereport;
 
-import android.app.DatePickerDialog;
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,13 +8,12 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.DatePicker;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -32,7 +28,8 @@ import rx.schedulers.Schedulers;
 
 public class EarthquakeActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, OnDataPass {
 
-    private int magnitude;
+    private static int MAGNITUDE;
+    private static String DIALOG_DATE = "dialogDate";
     private List<Feature> featureList;
     public static List<Feature> FILTERED_LIST_BY_MAG;
     public static SimpleDateFormat DATE_FORMAT;
@@ -40,15 +37,23 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
     private SwipeRefreshLayout swipeRefreshLayout;
     private SimpleDateFormat getDateFormatForQuery;
     private RecyclerView recyclerView;
-    private Date date;
+    private Date mDate;
     private FloatingActionButton fab;
     private PropertiesAdapter mAdapter;
+    private DatePickerFragment datePickerFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.earthquake_activity);
+
+        if (savedInstanceState != null){
+            mDate = (Date) savedInstanceState.getSerializable("date");
+        }else
+            mDate = new Date();
+
         initialize();
+
         //download data and fill list
         retrofitRequest();
     }
@@ -63,7 +68,7 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
 
         QuakeService service = retrofit.create(QuakeService.class);
 
-        Observable<Quake> mQuakeObservable = service.getQuery(1, getDateFormatForQuery.format(date));
+        Observable<Quake> mQuakeObservable = service.getQuery(1, getDateFormatForQuery.format(mDate));
         mQuakeObservable
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -92,60 +97,43 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
 
 
     public void onClickChooseDate() {
-        DatePickerFragment dialogFragment = new DatePickerFragment();
-        dialogFragment.show(getFragmentManager(), "dialogFragment");
+        FragmentManager fragmentManager = getFragmentManager();
+        datePickerFragment = new DatePickerFragment();
+        datePickerFragment.show(fragmentManager, DIALOG_DATE);
     }
 
 
+    //receive scale from ScaleFragment
     @Override
     public void onDataPass(int selectedScale) {
-        magnitude = selectedScale;
+        MAGNITUDE = selectedScale;
         //filterListByMagnitude();
         retrofitRequest();
     }
 
-    private class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
-
-        public DatePickerFragment() {
-        }
-
-        @Override
-        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-            date = new Date(year - 1900, monthOfYear, dayOfMonth);
-            retrofitRequest();
-        }
-
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the current date as the default date in the picker
-            final Calendar calendar = Calendar.getInstance();
-            int year = calendar.get(Calendar.YEAR);
-            int month = calendar.get(Calendar.MONTH);
-            int day = calendar.get(Calendar.DAY_OF_MONTH);
-
-            // Create a new instance of DatePickerDialog and return it
-            return new DatePickerDialog(getActivity(), this, year, month, day);
-        }
+    //receive date from DatePickerFragment
+    @Override
+    public void onDatePass(Date date) {
+        mDate = date;
+        retrofitRequest();
     }
 
 
-    //filter list by setting min magnitude
+    //filter list by setting min MAGNITUDE
     private void filterListByMagnitude() {
         FILTERED_LIST_BY_MAG.clear();
         /*FILTERED_LIST_BY_MAG
                 .addAll(featureList.stream()
-                .filter(feature -> feature.getProperties().getMag() >= magnitude)
+                .filter(feature -> feature.getProperties().getMag() >= MAGNITUDE)
                 .collect(Collectors.toList()));*/
         for (Feature feature : featureList) {
-            if (feature.getProperties().getMag() >= magnitude)
+            if (feature.getProperties().getMag() >= MAGNITUDE)
                 FILTERED_LIST_BY_MAG.add(feature);
         }
         mAdapter.notifyDataSetChanged();
     }
 
     private void initialize() {
-        magnitude = 1;
         featureList = new ArrayList<>();
         FILTERED_LIST_BY_MAG = new ArrayList<>();
         mAdapter = new PropertiesAdapter(FILTERED_LIST_BY_MAG);
@@ -153,10 +141,11 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
         swipeRefreshLayout.setOnRefreshListener(EarthquakeActivity.this);
 
-        //set date
-        date = new Date();
+        //set mDate
+
         DATE_FORMAT = new SimpleDateFormat("LLL dd, yyyy", Locale.UK);
         getDateFormatForQuery = new SimpleDateFormat("yyyy-MM-dd", Locale.UK);
+
 
         recyclerView = (RecyclerView) findViewById(R.id.list);
         recyclerView.setHasFixedSize(true);
@@ -194,16 +183,14 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        FragmentManager manager = getFragmentManager();
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_set_mag:
-
-                FragmentManager manager = getFragmentManager();
                 new ScaleFragment().show(manager, "ScaleFragment");
                 return true;
-
             case R.id.action_set_date:
-                onClickChooseDate();
+                new DatePickerFragment().show(manager, DIALOG_DATE);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -218,6 +205,14 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         return true;
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mDate != null){
+            outState.putSerializable("date", mDate);
+        }
+
+    }
 }
 
 

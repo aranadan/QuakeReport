@@ -17,9 +17,9 @@ import java.util.List;
 
 public class PropertiesAdapter extends RecyclerView.Adapter<PropertiesAdapter.ViewHolder> {
         private List<Feature> list;
-    Context context;
+    private Context context;
 
-    public PropertiesAdapter(List<Feature> list) {
+    PropertiesAdapter(List<Feature> list) {
         this.list = list;
     }
 
@@ -30,8 +30,7 @@ public class PropertiesAdapter extends RecyclerView.Adapter<PropertiesAdapter.Vi
         View v = LayoutInflater.from(context)
                 .inflate(R.layout.activity_earthquake_list_item, parent, false);
 
-        ViewHolder viewHolder = new ViewHolder(v);
-        return viewHolder;
+        return new ViewHolder(v);
     }
 
     @Override
