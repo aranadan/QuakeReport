@@ -1,9 +1,10 @@
 package com.example.android.quakereport;
 
-/**
- * Created by Andrey on 21.12.2017.
- */
+import java.util.Date;
+
 
 public interface OnDataPass {
-    public void onDataPass(int selectedScale);
+    void onDataPass(int selectedScale);
+    void onDatePass(Date date);
+
 }

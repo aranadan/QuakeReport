@@ -28,7 +28,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Initialize the manager with the context and the map.
         // (Activity extends context, so we can pass 'this' in the constructor.)
-        mClusterManager = new ClusterManager<Feature>(this, mMap);
+        mClusterManager = new ClusterManager<>(this, mMap);
 
     }
 
@@ -44,7 +44,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Initialize the manager with the context and the map.
         // (Activity extends context, so we can pass 'this' in the constructor.)
-        mClusterManager = new ClusterManager<Feature>(this, mMap);
+        mClusterManager = new ClusterManager<>(this, mMap);
         mClusterManager.setRenderer(new EarthquakeIconRenderer(this.getApplicationContext(),mMap,mClusterManager));
 
         // Point the map's listeners at the listeners implemented by the cluster

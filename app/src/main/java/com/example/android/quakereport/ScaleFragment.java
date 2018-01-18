@@ -5,16 +5,12 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.NumberPicker;
-import android.widget.Toast;
 
-import static android.app.Activity.RESULT_OK;
 
 public class ScaleFragment extends DialogFragment {
 
@@ -28,31 +24,21 @@ public class ScaleFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        View view = LayoutInflater.from(getActivity()).inflate(R.layout.activity_scale, null);
+        View view = LayoutInflater.from(getActivity()).inflate(R.layout.number_picker, null);
 
         final Vibrator vibrator = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
 
-        final NumberPicker numberPicker = (NumberPicker) view.findViewById(R.id.numberPicker);
+        final NumberPicker numberPicker = (NumberPicker) view.findViewById(R.id.number_picker);
         numberPicker.setMaxValue(10);
         numberPicker.setMinValue(1);
         //disable infinite scrolling
         numberPicker.setWrapSelectorWheel(false);
-        numberPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
-            @Override
-            public void onValueChange(NumberPicker numberPicker, int i, int i1) {
-                vibrator.vibrate(20);
-            }
-        });
+        numberPicker.setOnValueChangedListener((numberPicker1, i, i1) -> vibrator.vibrate(20));
 
         return new AlertDialog.Builder(getActivity())
                 .setView(view)
                 .setTitle(R.string.set_scale)
                 .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        mDataPasser.onDataPass(numberPicker.getValue());
-                    }
-                }).create();
+                .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> mDataPasser.onDataPass(numberPicker.getValue())).create();
     }
 }
