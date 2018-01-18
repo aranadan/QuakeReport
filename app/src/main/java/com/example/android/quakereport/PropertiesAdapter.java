@@ -5,13 +5,12 @@ import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 
@@ -42,8 +41,8 @@ public class PropertiesAdapter extends RecyclerView.Adapter<PropertiesAdapter.Vi
             context.startActivity(intentCallWeb);
         });
 
-        holder.date.setText(EarthquakeActivity.DATE_FORMAT.format(new Date(properties.getTime())));
-        holder.time.setText(new SimpleDateFormat("HH:mm").format(new Date(properties.getTime())));
+        holder.date.setText(DateFormat.format("EEE, MMM dd",properties.getTime()));
+        holder.time.setText(DateFormat.format("HH:mm:ss",properties.getTime()));
 
         if (properties.getPlace().contains("of")) {
             String fullLocation = properties.getPlace();
