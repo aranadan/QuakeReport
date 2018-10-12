@@ -40,6 +40,7 @@ public class EarthquakeIconRenderer extends DefaultClusterRenderer<Feature> {
         Canvas c = new Canvas(bm);
         c.drawCircle(d/2, d/2, d/2, p);
         markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bm));
+        //markerOptions.icon(BitmapDescriptorFactory.defaultMarker());
         markerOptions.alpha(0.8F);
         super.onBeforeClusterItemRendered(item, markerOptions);
     }
