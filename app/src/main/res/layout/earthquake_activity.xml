@@ -17,11 +17,6 @@
     android:paddingRight="16dp"
     android:paddingStart="16dp">
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/swipe_container"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/list"
@@ -32,7 +27,7 @@
             android:orientation="vertical">
         </android.support.v7.widget.RecyclerView>
 
-    </android.support.v4.widget.SwipeRefreshLayout>
+
 
 </LinearLayout>
 

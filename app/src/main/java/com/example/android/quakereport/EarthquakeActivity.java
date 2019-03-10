@@ -8,7 +8,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -26,7 +25,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 
-public class EarthquakeActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, OnDataPass {
+public class EarthquakeActivity extends AppCompatActivity implements OnDataPass {
 
     private static int MAGNITUDE;
     private static String DIALOG_DATE = "dialogDate";
@@ -34,13 +33,12 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
     public static List<Feature> FILTERED_LIST_BY_MAG;
     public static SimpleDateFormat DATE_FORMAT;
 
-    private SwipeRefreshLayout swipeRefreshLayout;
+    //private SwipeRefreshLayout swipeRefreshLayout;
     private SimpleDateFormat getDateFormatForQuery;
-    private RecyclerView recyclerView;
     private Date mDate;
     private FloatingActionButton fab;
     private PropertiesAdapter mAdapter;
-    private DatePickerFragment datePickerFragment;
+    //private DatePickerFragment datePickerFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,16 +72,15 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
                 .observeOn(AndroidSchedulers.mainThread())
                 .flatMap(quake -> Observable.from(quake.getFeatures()))
                 .subscribe(
-                        //fill objects to list
+                        //on next action
                         q -> featureList.add(q)
                         //on error action
-                        , throwable -> {
-                        }
+                        , throwable -> {}
                         //on complete action
                         , this::filterListByMagnitude);
     }
 
-    @Override
+   /* @Override
     public void onRefresh() {
         // start show progress
         swipeRefreshLayout.setRefreshing(true);
@@ -93,14 +90,14 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
             //download data and fill list
             retrofitRequest();
         }, 1000);
-    }
+    }*/
 
 
-    public void onClickChooseDate() {
+    /*public void onClickChooseDate() {
         FragmentManager fragmentManager = getFragmentManager();
         datePickerFragment = new DatePickerFragment();
         datePickerFragment.show(fragmentManager, DIALOG_DATE);
-    }
+    }*/
 
 
     //receive scale from ScaleFragment
@@ -108,7 +105,7 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
     public void onDataPass(int selectedScale) {
         MAGNITUDE = selectedScale;
         //filterListByMagnitude();
-        retrofitRequest();
+        filterListByMagnitude();
     }
 
     //receive date from DatePickerFragment
@@ -138,8 +135,8 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         FILTERED_LIST_BY_MAG = new ArrayList<>();
         mAdapter = new PropertiesAdapter(FILTERED_LIST_BY_MAG);
 
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
-        swipeRefreshLayout.setOnRefreshListener(EarthquakeActivity.this);
+        //swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
+        //swipeRefreshLayout.setOnRefreshListener(EarthquakeActivity.this);
 
         //set mDate
 
@@ -147,7 +144,7 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         getDateFormatForQuery = new SimpleDateFormat("yyyy-MM-dd", Locale.UK);
 
 
-        recyclerView = (RecyclerView) findViewById(R.id.list);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.list);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(mAdapter);
@@ -210,8 +207,8 @@ public class EarthquakeActivity extends AppCompatActivity implements SwipeRefres
         super.onSaveInstanceState(outState);
         if (mDate != null){
             outState.putSerializable("date", mDate);
+            //outState.putParcelableArrayList(featureList);
         }
-
     }
 }
 

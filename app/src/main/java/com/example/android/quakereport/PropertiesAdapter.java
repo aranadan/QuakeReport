@@ -15,7 +15,7 @@ import java.util.List;
 
 
 public class PropertiesAdapter extends RecyclerView.Adapter<PropertiesAdapter.ViewHolder> {
-        private List<Feature> list;
+    private List<Feature> list;
     private Context context;
 
     PropertiesAdapter(List<Feature> list) {
@@ -26,8 +26,7 @@ public class PropertiesAdapter extends RecyclerView.Adapter<PropertiesAdapter.Vi
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         context = parent.getContext();
         //get View
-        View v = LayoutInflater.from(context)
-                .inflate(R.layout.activity_earthquake_list_item, parent, false);
+        View v = LayoutInflater.from(context).inflate(R.layout.activity_earthquake_list_item, parent, false);
 
         return new ViewHolder(v);
     }
@@ -41,8 +40,8 @@ public class PropertiesAdapter extends RecyclerView.Adapter<PropertiesAdapter.Vi
             context.startActivity(intentCallWeb);
         });
 
-        holder.date.setText(DateFormat.format("EEE, MMM dd",properties.getTime()));
-        holder.time.setText(DateFormat.format("HH:mm:ss",properties.getTime()));
+        holder.date.setText(DateFormat.format("EEE, MMM dd", properties.getTime()));
+        holder.time.setText(DateFormat.format("HH:mm:ss", properties.getTime()));
 
         if (properties.getPlace().contains("of")) {
             String fullLocation = properties.getPlace();
@@ -72,7 +71,7 @@ public class PropertiesAdapter extends RecyclerView.Adapter<PropertiesAdapter.Vi
         return list.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder {
         TextView mag, location, offset, date, time;
 
         public ViewHolder(View itemView) {
